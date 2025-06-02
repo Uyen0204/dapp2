@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0; // Hoặc ^0.8.18 nếu bạn muốn giữ nguyên
+pragma solidity ^0.8.4; 
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol"; // Đường dẫn đúng cho OZ v4+
 import "@openzeppelin/contracts/access/Ownable.sol";

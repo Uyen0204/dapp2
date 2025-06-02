@@ -8,7 +8,7 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "0.8.0",   // Match với version trong smart contract
+      version: "0.8.4",   // Match với version trong smart contract
       settings: {
         optimizer: {
           enabled: true, // Quan trọng: bật optimizer
