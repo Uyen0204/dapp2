@@ -13,20 +13,20 @@ contract ItemsManagement {
 }
 
 // Interface cho RoleManagement 
-interface IRoleManagementMinimal { // Interface tối thiểu RoleManagement mà CTM cần
+interface IRoleManagementMinimalInterface { // Interface tối thiểu RoleManagement mà CTM cần
     function FINANCE_DIRECTOR_ROLE() external view returns (bytes32);
     function WAREHOUSE_MANAGER_ROLE() external view returns (bytes32); // Giữ lại nếu còn dùng cho logic top-up
     function hasRole(bytes32 role, address account) external view returns (bool);
 }
 
 // Interface MỚI để CTM tương tác với RoleManagement cho việc kích hoạt BĐH
-interface IRoleManagementForBoardActivation {
+interface IRoleManagementForBoardActivationInterface {
     function activateBoardMemberByTreasury(address candidate, uint256 contributedAmount) external;
     function getProposedShareCapital(address candidate) external view returns (uint256);
 }
 
 // Interface cho ItemsManagement
-interface IItemsManagementMinimal { // Interface tối thiểu ItemsManagement mà CTM cần
+interface IItemsManagementMinimalInterface { // Interface tối thiểu ItemsManagement mà CTM cần
     function getWarehouseInfo(address warehouseAddress) external view returns (ItemsManagement.PhysicalLocationInfo memory);
     function getSupplierInfo(address supplierAddress) external view returns (ItemsManagement.SupplierInfo memory);
 }
@@ -35,8 +35,8 @@ interface IItemsManagementMinimal { // Interface tối thiểu ItemsManagement m
 
 // Hợp đồng Quản lý Ngân quỹ Công ty
 contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
-    IRoleManagementMinimal public immutable roleManagement;    // Dùng interface tối thiểu
-    IItemsManagementMinimal public immutable itemsManagement; // Dùng interface tối thiểu
+    IRoleManagementMinimalInterface public immutable roleManagement;    // Dùng interface tối thiểu
+    IItemsManagementMinimalInterface public immutable itemsManagement; // Dùng interface tối thiểu
     
     address public roleManagementFullAddress; // Địa chỉ đầy đủ của RoleManagement cho việc kích hoạt BĐH và các chức năng khác nếu cần
     address public warehouseSupplierOrderManagement;
@@ -81,8 +81,8 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         require(_roleManagementAddress != address(0), "CTM: Dia chi RoleManagement khong hop le");
         require(_itemsManagementAddress != address(0), "CTM: Dia chi ItemsManagement khong hop le");
         require(_expectedInitialCapital >= 0, "CTM: Von ban dau du kien khong the am"); // Cho phép vốn ban đầu là 0
-        roleManagement = IRoleManagementMinimal(_roleManagementAddress);
-        itemsManagement = IItemsManagementMinimal(_itemsManagementAddress);
+        roleManagement = IRoleManagementMinimalInterface(_roleManagementAddress);
+        itemsManagement = IItemsManagementMinimalInterface(_itemsManagementAddress);
         roleManagementFullAddress = _roleManagementAddress; // Lưu địa chỉ đầy đủ để gọi các hàm trong IRoleManagementForBoardActivation
 
         if (_expectedInitialCapital > 0) {
@@ -277,7 +277,7 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
 
         require(roleManagementFullAddress != address(0), "CTM: Dia chi RoleManagement day du chua duoc thiet lap");
         
-        uint256 proposedCapital = IRoleManagementForBoardActivation(roleManagementFullAddress).getProposedShareCapital(candidate);
+        uint256 proposedCapital = IRoleManagementForBoardActivationInterface(roleManagementFullAddress).getProposedShareCapital(candidate);
         
         require(proposedCapital > 0, "CTM: Khong co de xuat von cho ung vien nay hoac RoleManagement chua san sang");
         require(amountContributed == proposedCapital, "CTM: So tien gop khong dung voi de xuat von");
@@ -286,7 +286,7 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         emit BoardMemberContributionReceived(candidate, amountContributed);
 
         // Gọi lại RoleManagement để kích hoạt thành viên
-        IRoleManagementForBoardActivation(roleManagementFullAddress).activateBoardMemberByTreasury(candidate, amountContributed);
+        IRoleManagementForBoardActivationInterface(roleManagementFullAddress).activateBoardMemberByTreasury(candidate, amountContributed);
     }
 
     function getBalance() external view returns (uint256) { return address(this).balance; }

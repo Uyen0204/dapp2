@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 // Interface để tương tác với hợp đồng RoleManagement
-interface IRoleManagement {
+interface IRoleManagementInterface {
     function STORE_DIRECTOR_ROLE() external view returns (bytes32);
     function WAREHOUSE_DIRECTOR_ROLE() external view returns (bytes32);
     function STORE_MANAGER_ROLE() external view returns (bytes32);
@@ -16,7 +16,7 @@ interface IRoleManagement {
 }
 
 contract ItemsManagement is AccessControl {
-    IRoleManagement public roleManagementExternal;
+    IRoleManagementInterface public roleManagementExternal;
 
     struct ItemInfo {
         string itemId;
@@ -78,7 +78,7 @@ contract ItemsManagement is AccessControl {
 
     constructor(address _roleManagementExternalAddress) {
         require(_roleManagementExternalAddress != address(0), "ItemsM: Dia chi RM Ngoai khong hop le");
-        roleManagementExternal = IRoleManagement(_roleManagementExternalAddress);
+        roleManagementExternal = IRoleManagementInterface(_roleManagementExternalAddress);
         grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 

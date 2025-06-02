@@ -33,7 +33,7 @@ struct SupplierItemListing_WSOM {
 
 
 // --- INTERFACES ---
-interface ICompanyTreasuryManager {
+interface ICompanyTreasuryManagerInterface {
     function requestEscrowForSupplierOrder(address warehouseAddress, address supplierAddress, string calldata supplierOrderId, uint256 amount) external returns (bool success);
     function releaseEscrowToSupplier(address supplierAddress, string calldata supplierOrderId, uint256 amount) external returns (bool success);
     function refundEscrowToTreasury(address warehouseAddress, string calldata supplierOrderId, uint256 amount) external returns (bool success);
@@ -42,29 +42,29 @@ interface ICompanyTreasuryManager {
     function WAREHOUSE_SPENDING_LIMIT_PER_PERIOD_CONST() external view returns (uint256 limit);
 }
 
-interface IRoleManagement {
+interface IRoleManagementInterface {
     function WAREHOUSE_MANAGER_ROLE() external view returns (bytes32);
     function SUPPLIER_ROLE() external view returns (bytes32);
     function hasRole(bytes32 role, address account) external view returns (bool);
 }
 
-interface IItemsManagement {
+interface IItemsManagementInterface {
     function getWarehouseInfo(address warehouseAddress) external view returns (PhysicalLocationInfo_WSOM memory);
     function getSupplierInfo(address supplierAddress) external view returns (SupplierInfo_WSOM memory);
     function getSupplierItemDetails(address supplierAddress, string calldata itemId) external view returns (SupplierItemListing_WSOM memory);
 }
 
-interface IWarehouseInventoryManagement {
+interface IWarehouseInventoryManagementInterface {
     function recordStockInFromSupplier(address warehouseAddress, string calldata itemId, uint256 quantity, uint256 wsOrderId) external;
 }
 // --- END INTERFACES ---
 
 
 contract WarehouseSupplierOrderManagement is ReentrancyGuard, Ownable {
-    IRoleManagement public immutable roleManagement;
-    IItemsManagement public immutable itemsManagement;
-    ICompanyTreasuryManager public immutable companyTreasuryManager;
-    IWarehouseInventoryManagement public warehouseInventoryManagement;
+    IRoleManagementInterface public immutable roleManagement;
+    IItemsManagementInterface public immutable itemsManagement;
+    ICompanyTreasuryManagerInterface public immutable companyTreasuryManager;
+    IWarehouseInventoryManagementInterface public warehouseInventoryManagement;
 
     uint256 public nextWSOrderId;
 
@@ -109,15 +109,15 @@ contract WarehouseSupplierOrderManagement is ReentrancyGuard, Ownable {
         require(_itemsManagementAddress != address(0), "WSOM: Dia chi ItemsM khong hop le");
         require(_companyTreasuryManagerAddress != address(0), "WSOM: Dia chi CTM khong hop le");
 
-        roleManagement = IRoleManagement(_roleManagementAddress);
-        itemsManagement = IItemsManagement(_itemsManagementAddress);
-        companyTreasuryManager = ICompanyTreasuryManager(_companyTreasuryManagerAddress);
+        roleManagement = IRoleManagementInterface(_roleManagementAddress);
+        itemsManagement = IItemsManagementInterface(_itemsManagementAddress);
+        companyTreasuryManager = ICompanyTreasuryManagerInterface(_companyTreasuryManagerAddress);
         nextWSOrderId = 1;
     }
 
     function setWarehouseInventoryManagementAddress(address _wimAddress) external onlyOwner {
         require(_wimAddress != address(0), "WSOM: Dia chi WIM khong hop le");
-        warehouseInventoryManagement = IWarehouseInventoryManagement(_wimAddress);
+        warehouseInventoryManagement = IWarehouseInventoryManagementInterface(_wimAddress);
         emit WarehouseInventoryManagementAddressSet(_wimAddress);
     }
 

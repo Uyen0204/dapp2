@@ -9,19 +9,19 @@ contract ItemsManagement { // Tên hợp đồng, không phải tên interface
 }
 
 // Interface cho RoleManagement để kiểm tra vai trò Quản lý Kho
-interface IRoleManagement {
+interface IRoleManagementInterface {
     function WAREHOUSE_MANAGER_ROLE() external view returns (bytes32);
     function hasRole(bytes32 role, address account) external view returns (bool);
 }
 
 // Interface cho ItemsManagement để lấy thông tin kho (tùy chọn)
-interface IItemsManagement {
+interface IItemsManagementInterface {
     function getWarehouseInfo(address warehouseAddress) external view returns (ItemsManagement.PhysicalLocationInfo memory);
     // Có thể không cần getItemInfo nếu tin tưởng itemId từ các hợp đồng khác
 }
 
 // Interface cho StoreInventoryManagement để thông báo khi hàng đã được chuyển
-interface IStoreInventoryManagement {
+interface IStoreInventoryManagementInterface {
     function confirmStockReceivedFromWarehouse(
         address storeAddress,       // Cửa hàng nhận
         string calldata itemId,     // Mặt hàng
@@ -33,9 +33,9 @@ interface IStoreInventoryManagement {
 
 // Hợp đồng Quản lý Tồn kho Chính (Kho trung tâm)
 contract WarehouseInventoryManagement is Ownable {
-    IRoleManagement public roleManagementExternal;
-    IItemsManagement public itemsManagementExternal; // Tùy chọn, để kiểm tra thêm
-    IStoreInventoryManagement public storeInventoryManagementExternal; // Hợp đồng Quản lý Tồn kho Cửa hàng
+    IRoleManagementInterface public roleManagementExternal;
+    IItemsManagementInterface public itemsManagementExternal; // Tùy chọn, để kiểm tra thêm
+    IStoreInventoryManagementInterface public storeInventoryManagementExternal; // Hợp đồng Quản lý Tồn kho Cửa hàng
     
     address public warehouseSupplierOrderManagementAddress; // Để nhận hàng từ NCC
 
@@ -90,10 +90,10 @@ contract WarehouseInventoryManagement is Ownable {
     );
     constructor(address _roleManagementAddress, address _itemsManagementAddress) Ownable() {
         require(_roleManagementAddress != address(0), "WIM: Dia chi RM khong hop le"); // WIM: Địa chỉ RM không hợp lệ
-        roleManagementExternal = IRoleManagement(_roleManagementAddress);
+        roleManagementExternal = IRoleManagementInterface(_roleManagementAddress);
         
         if (_itemsManagementAddress != address(0)) {
-            itemsManagementExternal = IItemsManagement(_itemsManagementAddress);
+            itemsManagementExternal = IItemsManagementInterface(_itemsManagementAddress);
         }
     }
 
@@ -111,7 +111,7 @@ contract WarehouseInventoryManagement is Ownable {
     // --- HÀM SETTER (Chỉ Owner) ---
     function setStoreInventoryManagementAddress(address _simAddress) external onlyOwner {
         require(_simAddress != address(0), "WIM: Dia chi SIM khong hop le"); // WIM: Địa chỉ SIM không hợp lệ
-        storeInventoryManagementExternal = IStoreInventoryManagement(_simAddress);
+        storeInventoryManagementExternal = IStoreInventoryManagementInterface(_simAddress);
     }
 
     function setWarehouseSupplierOrderManagementAddress(address _wsomAddress) external onlyOwner {

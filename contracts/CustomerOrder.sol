@@ -10,7 +10,7 @@ contract ItemsManagement {
 }
 
 // Interface cho RoleManagement
-interface IRoleManagement {
+interface IRoleManagementInterface {
     function STORE_MANAGER_ROLE() external view returns (bytes32);
     // function WAREHOUSE_MANAGER_ROLE() external view returns (bytes32); // Not directly used by COM anymore
     function DEFAULT_ADMIN_ROLE() external view returns (bytes32); // For setXyzAddress if Ownable is not used for that
@@ -18,19 +18,19 @@ interface IRoleManagement {
 }
 
 // Interface cho ItemsManagement
-interface IItemsManagement {
+interface IItemsManagementInterface {
     function getStoreInfo(address storeAddress) external view returns (ItemsManagement.PhysicalLocationInfo memory);
     function getItemRetailPriceAtStore(string calldata itemId, address storeAddress) external view returns (uint256 price, bool priceExists);
 }
 
 // Interface cho StoreInventoryManagement
-interface IStoreInventoryManagement {
+interface IStoreInventoryManagementInterface {
     function getStoreStockLevel(address storeAddress, string calldata itemId) external view returns (uint256);
     function deductStockForCustomerSale(address storeAddress, string calldata itemId, uint256 quantity, uint256 customerOrderId) external;
 }
 
 // Interface cho WarehouseInventoryManagement (cho việc trả hàng)
-interface IWarehouseInventoryManagement {
+interface IWarehouseInventoryManagementInterface {
     function recordReturnedStockByCustomer(
         address returnToWarehouseAddress,
         string calldata itemId,
@@ -40,16 +40,16 @@ interface IWarehouseInventoryManagement {
 }
 
 // MỚI: Interface cho CompanyTreasuryManager để gọi hàm hoàn tiền
-interface ICompanyTreasuryManager {
+interface ICompanyTreasuryManagerInterface {
     function refundCustomerOrderFromTreasury(uint256 orderId, address payable customerAddress, uint256 amountToRefund) external;
 }
 
 // Hợp đồng Quản lý Đơn hàng Khách hàng
 contract CustomerOrderManagement is ReentrancyGuard, Ownable {
-    IRoleManagement public immutable roleManagement;
-    IItemsManagement public immutable itemsManagement;
-    IStoreInventoryManagement public storeInventoryManagement; // Main inventory interaction
-    IWarehouseInventoryManagement public warehouseInventoryManagement; // For returns
+    IRoleManagementInterface public immutable roleManagement;
+    IItemsManagementInterface public immutable itemsManagement;
+    IStoreInventoryManagementInterface public storeInventoryManagement; // Main inventory interaction
+    IWarehouseInventoryManagementInterface public warehouseInventoryManagement; // For returns
     
     address public immutable companyTreasuryAddress; // Địa chỉ của CompanyTreasuryManager
 
@@ -132,8 +132,8 @@ contract CustomerOrderManagement is ReentrancyGuard, Ownable {
         require(_itemsManagementAddress != address(0), "COM: Dia chi ItemsM khong hop le");
         require(_companyTreasury != address(0), "COM: Dia chi ngan quy cong ty khong hop le");
 
-        roleManagement = IRoleManagement(_roleManagementAddress);
-        itemsManagement = IItemsManagement(_itemsManagementAddress);
+        roleManagement = IRoleManagementInterface(_roleManagementAddress);
+        itemsManagement = IItemsManagementInterface(_itemsManagementAddress);
         companyTreasuryAddress = _companyTreasury; // Lưu địa chỉ của CTM
         nextOrderId = 1;
     }
@@ -141,12 +141,12 @@ contract CustomerOrderManagement is ReentrancyGuard, Ownable {
     // --- SETTERS (Owner/Admin only) ---
     function setStoreInventoryManagementAddress(address _simAddress) external onlyOwner {
         require(_simAddress != address(0), "COM: Dia chi SIM khong hop le");
-        storeInventoryManagement = IStoreInventoryManagement(_simAddress);
+        storeInventoryManagement = IStoreInventoryManagementInterface(_simAddress);
         emit StoreInventoryManagementAddressSet(_simAddress);
     }
     function setWarehouseInventoryManagementAddress(address _wimAddress) external onlyOwner {
         require(_wimAddress != address(0), "COM: Dia chi WIM khong hop le");
-        warehouseInventoryManagement = IWarehouseInventoryManagement(_wimAddress);
+        warehouseInventoryManagement = IWarehouseInventoryManagementInterface(_wimAddress);
         emit WarehouseInventoryManagementAddressSet(_wimAddress);
     }
 
@@ -322,7 +322,7 @@ contract CustomerOrderManagement is ReentrancyGuard, Ownable {
 
         if (amountToRefund > 0) {
             // Gọi CTM để thực hiện hoàn tiền.
-            ICompanyTreasuryManager(companyTreasuryAddress).refundCustomerOrderFromTreasury(
+            ICompanyTreasuryManagerInterface(companyTreasuryAddress).refundCustomerOrderFromTreasury(
                 _orderId, 
                 payable(currentOrder.customerAddress), 
                 amountToRefund
