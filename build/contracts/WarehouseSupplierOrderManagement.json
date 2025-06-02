@@ -259,7 +259,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -272,7 +273,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -285,7 +287,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -298,7 +301,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -318,7 +322,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -342,7 +347,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -368,7 +374,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -392,7 +399,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -461,7 +469,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -669,7 +678,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -688,7 +698,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -707,7 +718,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.4+commit.c7e474f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_roleManagementAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_itemsManagementAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_companyTreasuryManagerAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"EscrowRequestedForWSOrder\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"}],\"name\":\"WSOrderCancelledBySupplier\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"warehouseManager\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"}],\"name\":\"WSOrderCancelledByWarehouse\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"WSOrderFundsReleasedToSupplier\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"warehouseAddress\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"internalSupplierOrderId\",\"type\":\"string\"}],\"name\":\"WSOrderPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"warehouseManager\",\"type\":\"address\"}],\"name\":\"WSOrderReceiptConfirmedByWarehouse\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"}],\"name\":\"WSOrderShipmentConfirmedBySupplier\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enum WarehouseSupplierOrderManagement.WSOrderStatus\",\"name\":\"newStatus\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"WSOrderStatusUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"wimAddress\",\"type\":\"address\"}],\"name\":\"WarehouseInventoryManagementAddressSet\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_wsOrderId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_reason\",\"type\":\"string\"}],\"name\":\"cancelOrderBySupplier\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_wsOrderId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_reason\",\"type\":\"string\"}],\"name\":\"cancelOrderByWarehouse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"companyTreasuryManager\",\"outputs\":[{\"internalType\":\"contract ICompanyTreasuryManagerInterface\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_supplier\",\"type\":\"address\"}],\"name\":\"getSupplierReceivedOrders\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_wsOrderId\",\"type\":\"uint256\"}],\"name\":\"getWSOrderDetails\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"warehouseAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"warehouseManager\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"itemId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"quantity\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unitPrice\",\"type\":\"uint256\"}],\"internalType\":\"struct WarehouseSupplierOrderManagement.WSOrderItem[]\",\"name\":\"items\",\"type\":\"tuple[]\"},{\"internalType\":\"uint256\",\"name\":\"totalAmount\",\"type\":\"uint256\"},{\"internalType\":\"enum WarehouseSupplierOrderManagement.WSOrderStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"creationTimestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"lastUpdateTimestamp\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"fundsEscrowed\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"fundsReleasedToSupplier\",\"type\":\"bool\"},{\"internalType\":\"string\",\"name\":\"internalSupplierOrderId\",\"type\":\"string\"}],\"internalType\":\"struct WarehouseSupplierOrderManagement.WSOrder\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_warehouse\",\"type\":\"address\"}],\"name\":\"getWarehouseSentOrders\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"itemsManagement\",\"outputs\":[{\"internalType\":\"contract IItemsManagementInterface\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nextWSOrderId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_warehouseAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_supplierAddress\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"itemId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"quantity\",\"type\":\"uint256\"}],\"internalType\":\"struct WarehouseSupplierOrderManagement.WSOrderItemInput[]\",\"name\":\"_itemsInput\",\"type\":\"tuple[]\"}],\"name\":\"placeOrderByWarehouse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"roleManagement\",\"outputs\":[{\"internalType\":\"contract IRoleManagementInterface\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_wimAddress\",\"type\":\"address\"}],\"name\":\"setWarehouseInventoryManagementAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_wsOrderId\",\"type\":\"uint256\"}],\"name\":\"supplierConfirmShipment\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"supplierReceivedOrderIds\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_wsOrderId\",\"type\":\"uint256\"}],\"name\":\"warehouseConfirmReceipt\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"warehouseInventoryManagement\",\"outputs\":[{\"internalType\":\"contract IWarehouseInventoryManagementInterface\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"warehouseSentOrderIds\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"wsOrders\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"wsOrderId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"warehouseAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"warehouseManager\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"totalAmount\",\"type\":\"uint256\"},{\"internalType\":\"enum WarehouseSupplierOrderManagement.WSOrderStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"creationTimestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"lastUpdateTimestamp\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"fundsEscrowed\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"fundsReleasedToSupplier\",\"type\":\"bool\"},{\"internalType\":\"string\",\"name\":\"internalSupplierOrderId\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/WarehouseSupplierOrderManagement.sol\":\"WarehouseSupplierOrderManagement\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":10},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0x1cae4f85f114ff17b90414f5da67365b1d00337abb5bce9bf944eb78a2c0673c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d5ff16b336ce8f906478d5f2eecc6435e00833bdc0b92f6b209cf9e92cb5b2b7\",\"dweb:/ipfs/QmRD1rAZEqQ73C33cdA3QoUyBDMEWnNKNMc6PNkAZWHeQQ\"]},\"@openzeppelin/contracts/security/ReentrancyGuard.sol\":{\"keccak256\":\"0xfcb587447e7627b2d0a19035adbd2ae8a8666f9e9c1ef36955c42c873dbe3798\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2b9a621c3b1d120df0c86f835eacb7a5d43d943a50693955d947bb621489edb3\",\"dweb:/ipfs/QmfVewBf8JipNdNFurrKYF7vc2XDmCHG9R3wVcR6ErxvJz\"]},\"@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0x063332def6917ddb056e79d963709f0be47689de1949549b414e53abf39aa0e0\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9dd687cccffd4d06214daca563100b8b392a382fdf72f2119e7f992d14fe2aac\",\"dweb:/ipfs/QmbMjwY57S9BTjHksCELgyf7gE1c4DSFGffW4AWJmnRv1K\"]},\"project:/contracts/WarehouseSupplierOrderManagement.sol\":{\"keccak256\":\"0xb54f1c36a3353fe8c41f70232afca4e36e93373f9a32cdb900321090c640b0a0\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b926b080e5936f94f679d403f29efb0fa063ec53c11c73f31d7a110a5bb6f5d3\",\"dweb:/ipfs/QmZTrBrxsRVuSBuuDxmjfDQLrWJ6TMM7p5g3Y2UGxn22jo\"]}},\"version\":1}",
@@ -42259,9 +42271,244 @@
     "name": "solc",
     "version": "0.8.4+commit.c7e474f2.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "5777": {
+      "events": {
+        "0xce3d6d85a70666e8f745665e526c93c262fa6189f8ac539f5190d9246ac25c87": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "wsOrderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "EscrowRequestedForWSOrder",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        "0x2f08073ee23e78e5da4b0af1367e579251ebd22078ee866c900b46a1621844a3": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "wsOrderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "supplierAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "WSOrderCancelledBySupplier",
+          "type": "event"
+        },
+        "0xd781810a411caea390040732c2c51eb255b78adc2f307aa228013e4921ced235": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "wsOrderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "warehouseManager",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "WSOrderCancelledByWarehouse",
+          "type": "event"
+        },
+        "0x6c3a76b1fd63a9e0a000ed4ece8f7f99d32f68ce757586538026bbaae41fd005": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "wsOrderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "supplierAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "WSOrderFundsReleasedToSupplier",
+          "type": "event"
+        },
+        "0xca5524882b8d6e81c9e5fe2d8c67f0f754c7036d71705466735472a0a1938523": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "wsOrderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "warehouseAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "supplierAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "totalAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "internalSupplierOrderId",
+              "type": "string"
+            }
+          ],
+          "name": "WSOrderPlaced",
+          "type": "event"
+        },
+        "0x92735abfa431d1388bc95bba2eb82528b69299773967b2e63b0a617efe3ef9bb": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "wsOrderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "warehouseManager",
+              "type": "address"
+            }
+          ],
+          "name": "WSOrderReceiptConfirmedByWarehouse",
+          "type": "event"
+        },
+        "0xb6f72180d63baa4edcd43d4ac9ecba3df06a50e8d13785f2a76025ec6e82aea5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "wsOrderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "supplierAddress",
+              "type": "address"
+            }
+          ],
+          "name": "WSOrderShipmentConfirmedBySupplier",
+          "type": "event"
+        },
+        "0x9f2454a0dc8b062d3b51f32601a6fb1b8401132fec88d6093084e57203f859da": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "wsOrderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "enum WarehouseSupplierOrderManagement.WSOrderStatus",
+              "name": "newStatus",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            }
+          ],
+          "name": "WSOrderStatusUpdated",
+          "type": "event"
+        },
+        "0x9d00bdb4c1bf918df98c2197d7890603abf58babbc46d1a0442c1d92855fa129": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "wimAddress",
+              "type": "address"
+            }
+          ],
+          "name": "WarehouseInventoryManagementAddressSet",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x86dAb054F6104b1F9e5fE6B2CF87EE2fe293E5Ed",
+      "transactionHash": "0xd0594821b34ed9508c23c9b7573ed1484f9d10d57f6c1eb18ac34e2995a39528"
+    }
+  },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-02T04:18:16.251Z",
+  "updatedAt": "2025-06-02T04:19:49.889Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {
