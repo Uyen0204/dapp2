@@ -142,10 +142,10 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
 
         // itemsManagement.getWarehouseInfo returns ItemsManagement.PhysicalLocationInfo
         // We imported ItemsManagement.sol, so the compiler knows this struct.
-        Interfaces.PhysicalLocationInfo memory whInfo = itemsManagement.getWarehouseInfo(_warehouseAddress);
+        PhysicalLocationInfo memory whInfo = itemsManagement.getWarehouseInfo(_warehouseAddress);
         require(whInfo.exists, "CTM: Kho khong ton tai trong IM");
 
-        ItemsManagement.SupplierInfo memory supInfo = itemsManagement.getSupplierInfo(_supplierAddress);
+        SupplierInfo memory supInfo = itemsManagement.getSupplierInfo(_supplierAddress);
         require(supInfo.exists && supInfo.isApprovedByBoard, "CTM: NCC khong ton tai hoac chua duoc phe duyet trong IM");
 
 

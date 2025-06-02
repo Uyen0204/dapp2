@@ -26,7 +26,7 @@ contract ItemsManagement is AccessControl {
         uint256 referencePriceCeiling; // Giá trần tham khảo do BĐH đặt
     }
 
-// --- MAPPINGS ---
+    // --- MAPPINGS ---
     mapping(string => ItemInfo) public items;
     mapping(address => PhysicalLocationInfo) public physicalLocations;
     mapping(address => SupplierInfo) public suppliers;
@@ -55,7 +55,7 @@ contract ItemsManagement is AccessControl {
     constructor(address _roleManagementExternalAddress) {
         require(_roleManagementExternalAddress != address(0), "ItemsM: Dia chi RM Ngoai khong hop le");
         roleManagementExternal = IRoleManagement(_roleManagementExternalAddress);
-        grantRole(DEFAULT_ADMIN_ROLE, msg.sender); // Sửa: dùng _grantRole thay vì grantRole trực tiếp trong constructor với OZ >=4.0
+        grantRole(DEFAULT_ADMIN_ROLE, msg.sender); 
     }
 
     // --- MODIFIERS ---
