@@ -31446,14 +31446,173 @@
   },
   "networks": {
     "5777": {
-      "events": {},
+      "events": {
+        "0xed4124503cbccb17ea26c625be47636abac278557bbb45442c60820f6b9dda4a": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "member",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "shareCapitalContributed",
+              "type": "uint256"
+            }
+          ],
+          "name": "BoardMemberActivated",
+          "type": "event"
+        },
+        "0x057b33cd829daf4c6abec68bb31f2afeeb2836f3ca471b6bb489889ce0f55414": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "candidate",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "shareCapitalProposed",
+              "type": "uint256"
+            }
+          ],
+          "name": "BoardMemberProposed",
+          "type": "event"
+        },
+        "0x5059b541f12100245fc1e0afc5a897e4f2b2ac151e48752188c24421eeb9750b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "member",
+              "type": "address"
+            }
+          ],
+          "name": "BoardMemberRemoved",
+          "type": "event"
+        },
+        "0x2420d7da1ad6c0ecc0c86e32b26e9a939959873f39778c4a2243f2ffcb7c6445": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "ctmAddress",
+              "type": "address"
+            }
+          ],
+          "name": "CompanyTreasuryManagerAddressSet",
+          "type": "event"
+        },
+        "0x4bead8e8f83a9bd5711f341b054c96c4448cb1a697860e7d59de17724d964033": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "candidate",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "shareCapitalProposed",
+              "type": "uint256"
+            }
+          ],
+          "name": "InitialBoardMemberProposedByAdmin",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0x5Fd9Bd2f20E27d57230DBA751D3FF7DD40Cad8f6",
-      "transactionHash": "0x6c7dc40536ead022b5fd6e1fce6affe7d6ceff1d4b3aec700b425aa6c1dbb475"
+      "address": "0xAE26Af8aE892a2B5B4c0f0A8F5C887cB2f0F922f",
+      "transactionHash": "0x5d93ab20d8ba281d57c22e3f602e80909162eafaabc1ca057593e1702b230899"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-02T14:14:48.569Z",
+  "updatedAt": "2025-06-02T14:17:42.259Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
