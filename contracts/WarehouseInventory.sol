@@ -2,42 +2,18 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-
-// Khai báo trước cấu trúc từ ItemsManagement
-contract ItemsManagement { // Tên hợp đồng, không phải tên interface
-    struct PhysicalLocationInfo { address locationId; string name; string locationType; address manager; bool exists; address designatedSourceWarehouseAddress; }
-}
-
-// Interface cho RoleManagement để kiểm tra vai trò Quản lý Kho
-interface IRoleManagementInterface {
-    function WAREHOUSE_MANAGER_ROLE() external view returns (bytes32);
-    function hasRole(bytes32 role, address account) external view returns (bool);
-}
-
-// Interface cho ItemsManagement để lấy thông tin kho (tùy chọn)
-interface IItemsManagementInterface {
-    function getWarehouseInfo(address warehouseAddress) external view returns (ItemsManagement.PhysicalLocationInfo memory);
-    // Có thể không cần getItemInfo nếu tin tưởng itemId từ các hợp đồng khác
-}
-
-// Interface cho StoreInventoryManagement để thông báo khi hàng đã được chuyển
-interface IStoreInventoryManagementInterface {
-    function confirmStockReceivedFromWarehouse(
-        address storeAddress,       // Cửa hàng nhận
-        string calldata itemId,     // Mặt hàng
-        uint256 quantity,           // Số lượng
-        address fromWarehouseAddress, // Kho đã gửi (địa chỉ của hợp đồng này)
-        uint256 internalTransferId  // ID giao dịch chuyển nội bộ
-    ) external;
-}
+import "./Interfaces.sol";      // Import file Interfaces.sol tập trung
+import "./ItemsManagement.sol"; // Import ItemsManagement để trình biên dịch liên kết contract
 
 // Hợp đồng Quản lý Tồn kho Chính (Kho trung tâm)
 contract WarehouseInventoryManagement is Ownable {
+    // Sử dụng các interface từ Interfaces.sol
     IRoleManagementInterface public roleManagementExternal;
-    IItemsManagementInterface public itemsManagementExternal; // Tùy chọn, để kiểm tra thêm
-    IStoreInventoryManagementInterface public storeInventoryManagementExternal; // Hợp đồng Quản lý Tồn kho Cửa hàng
-    
+    IItemsManagementInterface public itemsManagementExternal;
+    IStoreInventoryManagementInterface public storeInventoryManagementExternal;
+
     address public warehouseSupplierOrderManagementAddress; // Để nhận hàng từ NCC
+    address public customerOrderManagementAddress; // Để nhận hàng trả về từ khách (thêm nếu cần)
 
     // Tồn kho chính: warehouseAddress => itemId => quantity
     mapping(address => mapping(string => uint256)) public stockLevels;
@@ -47,175 +23,231 @@ contract WarehouseInventoryManagement is Ownable {
 
     uint256 public nextInternalTransferId = 1; // ID cho việc chuyển hàng nội bộ Kho -> Cửa hàng
 
-    // Sự kiện
-        event StockInFromSupplierRecorded(
-        address indexed warehouseAddress, // QUAN TRỌNG để lọc theo kho
-        string itemId,                    // itemId thường không cần indexed nếu bạn luôn có warehouseAddress
+    // --- EVENTS ---
+    event StockInFromSupplierRecorded(
+        address indexed warehouseAddress,
+        string itemId,
         uint256 quantityAdded,
-        uint256 indexed wsOrderId,        // QUAN TRỌNG để liên kết với đơn hàng NCC
-        address indexed byWsom            // QUAN TRỌNG để biết ai gọi
-    ); // 3 indexed: warehouseAddress, wsOrderId, byWsom
+        uint256 indexed wsOrderId,
+        address indexed byWsom
+    );
 
     event StockTransferredToStore(
-        address indexed fromWarehouseAddress, // QUAN TRỌNG
-        address indexed toStoreAddress,       // QUAN TRỌNG
+        address indexed fromWarehouseAddress,
+        address indexed toStoreAddress,
         string itemId,
         uint256 quantity,
-        uint256 indexed internalTransferId,   // QUAN TRỌNG để theo dõi
-        address byWarehouseManager            // Người quản lý kho thực hiện, có thể không cần indexed nếu bạn có fromWarehouseAddress
-    ); // 3 indexed: fromWarehouseAddress, toStoreAddress, internalTransferId
+        uint256 indexed internalTransferId,
+        address byWarehouseManager // Hoặc byRequestingStoreManager nếu bạn muốn ghi lại người yêu cầu ban đầu
+    );
 
     event CustomerStockReturnedRecordedToWarehouse(
-        address indexed returnToWarehouseAddress, // QUAN TRỌNG
+        address indexed returnToWarehouseAddress,
         string itemId,
         uint256 quantityReturned,
-        uint256 indexed customerOrderId         // QUAN TRỌNG
-        // Không cần thêm indexed ở đây
-    ); // 2 indexed: returnToWarehouseAddress, customerOrderId (OK)
+        uint256 indexed customerOrderId
+    );
 
     event StockAdjusted(
-        address indexed warehouseAddress,        // QUAN TRỌNG
-        string indexed itemId,                   // QUAN TRỌNG
+        address indexed warehouseAddress,
+        string indexed itemId,
         int256 quantityChange,
         string reason,
-        address indexed byAdmin                  // QUAN TRỌNG
-    ); // 3 indexed: warehouseAddress, itemId, byAdmin (OK)
+        address indexed byAdminOrManager // Thay đổi tên để phản ánh rõ hơn
+    );
 
     event ProcessedReturnedCustomerStockAtWarehouse(
-        address indexed warehouseAddress,        // QUAN TRỌNG
-        string indexed itemId,                   // QUAN TRỌNG
+        address indexed warehouseAddress,
+        string indexed itemId,
         uint256 quantityProcessed,
         bool addedToMainStock,
-        address indexed byAdmin                  // QUAN TRỌNG
+        address indexed byAdminOrManager // Thay đổi tên
     );
+
+    // Admin/Owner events
+    event StoreInventoryManagementAddressSet(address indexed simAddress);
+    event WarehouseSupplierOrderManagementAddressSet(address indexed wsomAddress);
+    event CustomerOrderManagementAddressSet(address indexed comAddress);
+
+
+    // --- CONSTRUCTOR ---
     constructor(address _roleManagementAddress, address _itemsManagementAddress) Ownable() {
-        require(_roleManagementAddress != address(0), "WIM: Dia chi RM khong hop le"); // WIM: Địa chỉ RM không hợp lệ
+        require(_roleManagementAddress != address(0), "WIM: Dia chi RM khong hop le");
         roleManagementExternal = IRoleManagementInterface(_roleManagementAddress);
-        
-        if (_itemsManagementAddress != address(0)) {
-            itemsManagementExternal = IItemsManagementInterface(_itemsManagementAddress);
-        }
+
+        require(_itemsManagementAddress != address(0), "WIM: Dia chi ItemsM khong hop le"); // Thêm kiểm tra null
+        itemsManagementExternal = IItemsManagementInterface(_itemsManagementAddress);
     }
 
+    // --- MODIFIERS ---
     // Modifier chỉ cho phép Quản lý Kho của kho được chỉ định
     modifier onlyWarehouseManager(address _warehouseAddress) {
-        // Kiểm tra _warehouseAddress có phải là kho hợp lệ VÀ msg.sender là quản lý của kho đó
-        ItemsManagement.PhysicalLocationInfo memory whInfo = itemsManagementExternal.getWarehouseInfo(_warehouseAddress);
-        require(whInfo.exists, "WIM: Kho chua duoc dang ky trong ItemsM"); // WIM: Kho chưa được đăng ký trong ItemsM
-        require(whInfo.manager == msg.sender, "WIM: Nguoi goi khong phai quan ly kho nay"); // WIM: Người gọi không phải quản lý kho này
+        require(_warehouseAddress != address(0), "WIM: Dia chi kho khong hop le");
+        // Sử dụng PhysicalLocationInfo đã được forward-declare trong Interfaces.sol
+        PhysicalLocationInfo memory whInfo = itemsManagementExternal.getWarehouseInfo(_warehouseAddress);
+        require(whInfo.exists, "WIM: Kho chua duoc dang ky trong ItemsM");
+        require(whInfo.manager == msg.sender, "WIM: Nguoi goi khong phai quan ly kho nay");
+
         bytes32 wmRole = roleManagementExternal.WAREHOUSE_MANAGER_ROLE();
-        require(roleManagementExternal.hasRole(wmRole, msg.sender), "WIM: Nguoi goi thieu vai tro QUAN_LY_KHO"); // WIM: Người gọi thiếu vai trò QUAN_LY_KHO
+        require(roleManagementExternal.hasRole(wmRole, msg.sender), "WIM: Nguoi goi thieu vai tro QUAN_LY_KHO");
         _;
     }
 
     // --- HÀM SETTER (Chỉ Owner) ---
     function setStoreInventoryManagementAddress(address _simAddress) external onlyOwner {
-        require(_simAddress != address(0), "WIM: Dia chi SIM khong hop le"); // WIM: Địa chỉ SIM không hợp lệ
+        require(_simAddress != address(0), "WIM: Dia chi SIM khong hop le");
         storeInventoryManagementExternal = IStoreInventoryManagementInterface(_simAddress);
+        emit StoreInventoryManagementAddressSet(_simAddress);
     }
 
     function setWarehouseSupplierOrderManagementAddress(address _wsomAddress) external onlyOwner {
-        require(_wsomAddress != address(0), "WIM: Dia chi WSOM khong hop le"); // WIM: Địa chỉ WSOM không hợp lệ
+        require(_wsomAddress != address(0), "WIM: Dia chi WSOM khong hop le");
         warehouseSupplierOrderManagementAddress = _wsomAddress;
+        emit WarehouseSupplierOrderManagementAddressSet(_wsomAddress);
     }
+
+    function setCustomerOrderManagementAddress(address _comAddress) external onlyOwner {
+        require(_comAddress != address(0), "WIM: Dia chi COM khong hop le");
+        customerOrderManagementAddress = _comAddress;
+        emit CustomerOrderManagementAddressSet(_comAddress);
+    }
+
 
     // --- CÁC HÀM CỐT LÕI ---
 
     // Được gọi bởi WarehouseSupplierOrderManagement khi có hàng mới từ nhà cung cấp
     function recordStockInFromSupplier(
-        address _warehouseAddress,      // Kho nhận hàng
-        string calldata _itemId,         // Mặt hàng
-        uint256 _quantity,              // Số lượng
-        uint256 _wsOrderId              // ID đơn hàng Kho-NCC
+        address _warehouseAddress,
+        string calldata _itemId,
+        uint256 _quantity,
+        uint256 _wsOrderId
     ) external {
-        require(msg.sender == warehouseSupplierOrderManagementAddress, "WIM: Nguoi goi khong phai WSOM"); // WIM: Người gọi không phải WSOM
-        require(_quantity > 0, "WIM: So luong them vao phai la so duong"); // WIM: Số lượng thêm vào phải là số dương
+        require(msg.sender == warehouseSupplierOrderManagementAddress, "WIM: Nguoi goi khong phai WSOM");
+        require(_warehouseAddress != address(0), "WIM: Dia chi kho khong hop le");
+        require(_quantity > 0, "WIM: So luong them vao phai la so duong");
+
         // Tùy chọn: Xác thực _warehouseAddress tồn tại thông qua itemsManagementExternal
+        // PhysicalLocationInfo memory whInfo = itemsManagementExternal.getWarehouseInfo(_warehouseAddress);
+        // require(whInfo.exists, "WIM: Kho nhan hang khong ton tai");
 
         stockLevels[_warehouseAddress][_itemId] += _quantity;
         emit StockInFromSupplierRecorded(_warehouseAddress, _itemId, _quantity, _wsOrderId, msg.sender);
     }
 
     // Được gọi bởi StoreInventoryManagement (thay mặt Quản lý Cửa hàng) để yêu cầu hàng
-    // Logic này giả định StoreInventoryManagement đã xác thực Quản lý Cửa hàng và kho nguồn chỉ định.
     function requestStockTransferToStore(
-        address _requestingStoreManager, // Người quản lý cửa hàng yêu cầu (được SIM xác thực)
-        address _storeAddress,          // Cửa hàng yêu cầu
-        address _warehouseAddress,      // Kho nguồn được chỉ định cho cửa hàng
-        string calldata _itemId,         // Mặt hàng
-        uint256 _quantity               // Số lượng
+        address _requestingStoreManager,
+        address _storeAddress,
+        address _warehouseAddress, // Kho nguồn được chỉ định cho cửa hàng
+        string calldata _itemId,
+        uint256 _quantity
     ) external returns (uint256 internalTransferId) {
-        require(msg.sender == address(storeInventoryManagementExternal), "WIM: Nguoi goi khong phai SIM"); // WIM: Người gọi không phải SIM
-        require(_quantity > 0, "WIM: So luong chuyen phai la so duong"); // WIM: Số lượng chuyển phải là số dương
-        
-        ItemsManagement.PhysicalLocationInfo memory whInfo = itemsManagementExternal.getWarehouseInfo(_warehouseAddress);
-        require(whInfo.exists, "WIM: Kho nguon chua duoc dang ky"); // WIM: Kho nguồn chưa được đăng ký
-        // Quản lý thực tế của _warehouseAddress có thể cần phê duyệt.
-        // Hiện tại, giả định nếu SIM gọi thì được phép nếu có đủ hàng.
+        require(msg.sender == address(storeInventoryManagementExternal), "WIM: Nguoi goi khong phai SIM");
+        require(_storeAddress != address(0), "WIM: Dia chi cua hang khong hop le");
+        require(_warehouseAddress != address(0), "WIM: Dia chi kho nguon khong hop le");
+        require(_quantity > 0, "WIM: So luong chuyen phai la so duong");
+        require(address(storeInventoryManagementExternal) != address(0), "WIM: Dia chi SIM chua duoc thiet lap");
+
+
+        PhysicalLocationInfo memory whInfo = itemsManagementExternal.getWarehouseInfo(_warehouseAddress);
+        require(whInfo.exists, "WIM: Kho nguon chua duoc dang ky");
+        // Logic hiện tại không yêu cầu người gọi phải là quản lý kho nguồn,
+        // mà tin tưởng SIM đã xác thực yêu cầu từ quản lý cửa hàng hợp lệ.
 
         uint256 currentStock = stockLevels[_warehouseAddress][_itemId];
-        require(currentStock >= _quantity, "WIM: Khong du hang trong kho"); // WIM: Không đủ hàng trong kho
-        
+        require(currentStock >= _quantity, "WIM: Khong du hang trong kho");
+
         stockLevels[_warehouseAddress][_itemId] = currentStock - _quantity;
         internalTransferId = nextInternalTransferId++;
 
-        // Thông báo cho StoreInventoryManagement để xác nhận đã nhận hàng
         storeInventoryManagementExternal.confirmStockReceivedFromWarehouse(
             _storeAddress,
             _itemId,
             _quantity,
-            _warehouseAddress, // Báo cáo kho nào đã hoàn thành
+            _warehouseAddress, // Báo cáo kho nào đã hoàn thành việc gửi
             internalTransferId
         );
 
-        emit StockTransferredToStore(_warehouseAddress, _storeAddress, _itemId, _quantity, internalTransferId, _requestingStoreManager); // _requestingStoreManager là người khởi tạo
+        emit StockTransferredToStore(_warehouseAddress, _storeAddress, _itemId, _quantity, internalTransferId, _requestingStoreManager);
         return internalTransferId;
     }
-    
+
     // Được gọi bởi CustomerOrderManagement khi khách hàng trả hàng về kho
     function recordReturnedStockByCustomer(
         address _returnToWarehouseAddress, // Kho cụ thể được chỉ định cho việc trả hàng
         string calldata _itemId,
         uint256 _quantity,
         uint256 _customerOrderId
-    ) external { // Được gọi bởi COM
-        // require(msg.sender == customerOrderManagementAddress, "WIM: Nguoi goi khong phai COM duoc uy quyen"); // Cần địa chỉ COM
-        require(_quantity > 0, "WIM: So luong tra ve phai la so duong"); // WIM: Số lượng trả về phải là số dương
+    ) external {
+        require(msg.sender == customerOrderManagementAddress, "WIM: Nguoi goi khong phai COM duoc uy quyen");
+        require(_returnToWarehouseAddress != address(0), "WIM: Dia chi kho tra hang khong hop le");
+        require(_quantity > 0, "WIM: So luong tra ve phai la so duong");
+
         // Tùy chọn: Xác thực _returnToWarehouseAddress qua itemsManagementExternal
+        // PhysicalLocationInfo memory whInfo = itemsManagementExternal.getWarehouseInfo(_returnToWarehouseAddress);
+        // require(whInfo.exists, "WIM: Kho tra hang khong ton tai");
 
         returnedStockByCustomer[_returnToWarehouseAddress][_itemId] += _quantity;
         emit CustomerStockReturnedRecordedToWarehouse(_returnToWarehouseAddress, _itemId, _quantity, _customerOrderId);
     }
 
-    // --- CÁC HÀM ADMIN (Chỉ Owner) ---
+    // --- CÁC HÀM ADMIN/QUẢN LÝ KHO (Owner hoặc Quản lý Kho tương ứng) ---
     function adjustStockManually(
         address _warehouseAddress,
         string calldata _itemId,
-        int256 _quantityChange,      // Có thể âm hoặc dương
+        int256 _quantityChange,
         string calldata _reason
-    ) external onlyOwner { // Hoặc onlyWarehouseManager(_warehouseAddress)
+    ) external { // Cho phép Owner hoặc Quản lý kho đó
+        bool isOwner = (msg.sender == owner());
+        bool isAuthorizedManager = false;
+        if (!isOwner) {
+            PhysicalLocationInfo memory whInfo = itemsManagementExternal.getWarehouseInfo(_warehouseAddress);
+            if (whInfo.exists && whInfo.manager == msg.sender) {
+                 bytes32 wmRole = roleManagementExternal.WAREHOUSE_MANAGER_ROLE();
+                 if(roleManagementExternal.hasRole(wmRole, msg.sender)){
+                    isAuthorizedManager = true;
+                 }
+            }
+        }
+        require(isOwner || isAuthorizedManager, "WIM: Khong co quyen dieu chinh ton kho nay");
+
+
         uint256 currentStock = stockLevels[_warehouseAddress][_itemId];
         if (_quantityChange > 0) {
             stockLevels[_warehouseAddress][_itemId] = currentStock + uint256(_quantityChange);
         } else if (_quantityChange < 0) {
             uint256 amountToDecrease = uint256(-_quantityChange);
-            require(currentStock >= amountToDecrease, "WIM: Dieu chinh thu cong dan den ton kho am"); // WIM: Điều chỉnh thủ công dẫn đến tồn kho âm
+            require(currentStock >= amountToDecrease, "WIM: Dieu chinh thu cong dan den ton kho am");
             stockLevels[_warehouseAddress][_itemId] = currentStock - amountToDecrease;
         } else {
-            revert("WIM: Thay doi so luong khong the bang khong"); // WIM: Thay đổi số lượng không thể bằng không
+            revert("WIM: Thay doi so luong khong the bang khong");
         }
         emit StockAdjusted(_warehouseAddress, _itemId, _quantityChange, _reason, msg.sender);
     }
 
     function processCustomerReturnedStock(
-        address _warehouseAddress,      // Kho chứa hàng trả về
+        address _warehouseAddress,
         string calldata _itemId,
         uint256 _quantityToProcess,
-        bool _addToMainStock          // Ví dụ: nếu mặt hàng có thể bán lại
-    ) external onlyOwner { // Hoặc onlyWarehouseManager(_warehouseAddress)
-        require(_quantityToProcess > 0, "WIM: So luong xu ly phai la so duong"); // WIM: Số lượng xử lý phải là số dương
+        bool _addToMainStock
+    ) external { // Cho phép Owner hoặc Quản lý kho đó
+        bool isOwner = (msg.sender == owner());
+        bool isAuthorizedManager = false;
+        if (!isOwner) {
+            PhysicalLocationInfo memory whInfo = itemsManagementExternal.getWarehouseInfo(_warehouseAddress);
+            if (whInfo.exists && whInfo.manager == msg.sender) {
+                 bytes32 wmRole = roleManagementExternal.WAREHOUSE_MANAGER_ROLE();
+                 if(roleManagementExternal.hasRole(wmRole, msg.sender)){
+                    isAuthorizedManager = true;
+                 }
+            }
+        }
+        require(isOwner || isAuthorizedManager, "WIM: Khong co quyen xu ly hang tra ve kho nay");
+
+
+        require(_quantityToProcess > 0, "WIM: So luong xu ly phai la so duong");
         uint256 currentReturnedStock = returnedStockByCustomer[_warehouseAddress][_itemId];
-        require(currentReturnedStock >= _quantityToProcess, "WIM: Khong du hang tra ve de xu ly"); // WIM: Không đủ hàng trả về để xử lý
+        require(currentReturnedStock >= _quantityToProcess, "WIM: Khong du hang tra ve de xu ly");
 
         returnedStockByCustomer[_warehouseAddress][_itemId] = currentReturnedStock - _quantityToProcess;
         if (_addToMainStock) {
@@ -226,10 +258,12 @@ contract WarehouseInventoryManagement is Ownable {
 
     // --- CÁC HÀM XEM (VIEW FUNCTIONS) ---
     function getWarehouseStockLevel(address _warehouseAddress, string calldata _itemId) external view returns (uint256) {
+        require(_warehouseAddress != address(0), "WIM: Dia chi kho khong hop le");
         return stockLevels[_warehouseAddress][_itemId];
     }
 
     function getCustomerReturnedStockLevelAtWarehouse(address _warehouseAddress, string calldata _itemId) external view returns (uint256) {
+        require(_warehouseAddress != address(0), "WIM: Dia chi kho khong hop le");
         return returnedStockByCustomer[_warehouseAddress][_itemId];
     }
 }
