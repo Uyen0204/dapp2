@@ -12,7 +12,7 @@ module.exports = {
       settings: {
         optimizer: {
           enabled: true, // Quan trọng: bật optimizer
-          runs: 600
+          runs: 1
     }
   }
 }
