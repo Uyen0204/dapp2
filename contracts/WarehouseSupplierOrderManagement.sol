@@ -282,7 +282,7 @@ contract WarehouseSupplierOrderManagement is ReentrancyGuard, Ownable {
         emit WSOrderStatusUpdated(_wsOrderId, currentOrder.status, block.timestamp);
     }
 
-    function _internalCancelOrder(uint256 _wsOrderId, WSOrderStatus _newStatus, address _canceller) internal {
+    function _internalCancelOrder(uint256 _wsOrderId, WSOrderStatus _newStatus, address) internal {
         WSOrder storage currentOrder = wsOrders[_wsOrderId];
         // Order can only be cancelled if it's pending shipment from supplier
         require(currentOrder.status == WSOrderStatus.PendingShipment, "WSOM: Don hang khong o trang thai co the huy");
