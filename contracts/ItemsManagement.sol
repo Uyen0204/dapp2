@@ -55,7 +55,7 @@ contract ItemsManagement is AccessControl {
     constructor(address _roleManagementExternalAddress) {
         require(_roleManagementExternalAddress != address(0), "ItemsM: Dia chi RM Ngoai khong hop le");
         roleManagementExternal = IRoleManagement(_roleManagementExternalAddress);
-        grantRole(DEFAULT_ADMIN_ROLE, msg.sender); 
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     // --- MODIFIERS ---
