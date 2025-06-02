@@ -26,32 +26,7 @@ contract ItemsManagement is AccessControl {
         uint256 referencePriceCeiling; // Giá trần tham khảo do BĐH đặt
     }
 
-    struct PhysicalLocationInfo {
-        address locationId;
-        string name;
-        string locationType; // "STORE" hoặc "WAREHOUSE"
-        address manager;      // Quản lý (Store Manager / Warehouse Manager) được gán bởi Director
-        bool exists;
-        bool isApprovedByBoard; // Được duyệt bởi BĐH
-        address designatedSourceWarehouseAddress; // Kho nguồn cho cửa hàng
-    }
-
-    struct SupplierInfo {
-        address supplierId;
-        string name;
-        bool isApprovedByBoard; // Được duyệt bởi BĐH
-        bool exists;
-    }
-
-    struct SupplierItemListing {
-        string itemId;
-        address supplierAddress;
-        uint256 price;
-        bool isApprovedByBoard; // Duyệt tự động hoặc thủ công bởi BĐH
-        bool exists;
-    }
-
-    // --- MAPPINGS ---
+// --- MAPPINGS ---
     mapping(string => ItemInfo) public items;
     mapping(address => PhysicalLocationInfo) public physicalLocations;
     mapping(address => SupplierInfo) public suppliers;
@@ -80,7 +55,7 @@ contract ItemsManagement is AccessControl {
     constructor(address _roleManagementExternalAddress) {
         require(_roleManagementExternalAddress != address(0), "ItemsM: Dia chi RM Ngoai khong hop le");
         roleManagementExternal = IRoleManagement(_roleManagementExternalAddress);
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender); // Sửa: dùng _grantRole thay vì grantRole trực tiếp trong constructor với OZ >=4.0
+        grantRole(DEFAULT_ADMIN_ROLE, msg.sender); // Sửa: dùng _grantRole thay vì grantRole trực tiếp trong constructor với OZ >=4.0
     }
 
     // --- MODIFIERS ---

@@ -1,99 +1,85 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4; 
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol"; // Đã sửa đường dẫn import
-
-// --- INTERFACES ---
-// Khai báo trước cấu trúc từ ItemsManagement (nếu bạn dùng struct trực tiếp trong interface)
-// Nếu không, chỉ cần khai báo interface là đủ.
-contract ItemsManagement { 
-    struct PhysicalLocationInfo { address locationId; string name; string locationType; address manager; bool exists; address designatedSourceWarehouseAddress; }
-    struct SupplierInfo { address supplierId; string name; bool isApprovedByBoard; bool exists;}
-}
-
-// Interface cho RoleManagement 
-interface IRoleManagementMinimalInterface { // Interface tối thiểu RoleManagement mà CTM cần
-    function FINANCE_DIRECTOR_ROLE() external view returns (bytes32);
-    function WAREHOUSE_MANAGER_ROLE() external view returns (bytes32); // Giữ lại nếu còn dùng cho logic top-up
-    function hasRole(bytes32 role, address account) external view returns (bool);
-}
-
-// Interface MỚI để CTM tương tác với RoleManagement cho việc kích hoạt BĐH
-interface IRoleManagementForBoardActivationInterface {
-    function activateBoardMemberByTreasury(address candidate, uint256 contributedAmount) external;
-    function getProposedShareCapital(address candidate) external view returns (uint256);
-}
-
-// Interface cho ItemsManagement
-interface IItemsManagementMinimalInterface { // Interface tối thiểu ItemsManagement mà CTM cần
-    function getWarehouseInfo(address warehouseAddress) external view returns (ItemsManagement.PhysicalLocationInfo memory);
-    function getSupplierInfo(address supplierAddress) external view returns (ItemsManagement.SupplierInfo memory);
-}
-// --- END INTERFACES ---
-
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./Interfaces.sol";      // Import file Interfaces.sol tập trung
+import "./ItemsManagement.sol"; // Import ItemsManagement để hiểu các struct như PhysicalLocationInfo, SupplierInfo
 
 // Hợp đồng Quản lý Ngân quỹ Công ty
 contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
-    IRoleManagementMinimalInterface public immutable roleManagement;    // Dùng interface tối thiểu
-    IItemsManagementMinimalInterface public immutable itemsManagement; // Dùng interface tối thiểu
-    
-    address public roleManagementFullAddress; // Địa chỉ đầy đủ của RoleManagement cho việc kích hoạt BĐH và các chức năng khác nếu cần
+    // Sử dụng các interface từ Interfaces.sol
+    IRoleManagement public immutable roleManagement;
+    IItemsManagementInterface public immutable itemsManagement;
+
+    address public roleManagementFullAddress; // Địa chỉ đầy đủ của RoleManagement cho việc kích hoạt BĐH
     address public warehouseSupplierOrderManagement;
-    address public customerOrderManagementAddress; 
+    address public customerOrderManagementAddress;
 
-    address public financeDirector; 
+    address public financeDirector;
 
+    // Constants for internal transfers and spending limits
     uint256 public constant INTERNAL_ROLE_TOP_UP_THRESHOLD = 20 ether;
     uint256 public constant INTERNAL_ROLE_TOP_UP_AMOUNT = 5 ether;
-    mapping(address => mapping(address => uint256)) public warehouseSpendingPolicies; 
-    mapping(address => uint256) public warehouseSpendingThisPeriod; 
     uint256 public constant WAREHOUSE_SPENDING_LIMIT_PER_PERIOD = 100 ether;
-    struct EscrowDetails { address warehouseAddress; address supplierAddress; uint256 amount; bool active; }
-    mapping(string => EscrowDetails) public activeEscrows;
 
-    // Sự kiện
+    // Mappings for spending policies and escrow
+    mapping(address => mapping(address => uint256)) public warehouseSpendingPolicies; // warehouse => supplier => maxAmountPerOrder
+    mapping(address => uint256) public warehouseSpendingThisPeriod; // warehouse => currentSpendingInPeriod
+
+    struct EscrowDetails {
+        address warehouseAddress;
+        address supplierAddress;
+        uint256 amount;
+        bool active;
+    }
+    mapping(string => EscrowDetails) public activeEscrows; // internalSupplierOrderId => EscrowDetails
+
+    // --- EVENTS ---
     event FundsDeposited(address indexed from, uint256 amount);
-    event InitialCapitalReceived(uint256 amount); // Vốn ban đầu khi deploy CTM
-    event BoardMemberContributionReceived(address indexed candidate, uint256 amount); // Khi ứng viên BĐH góp vốn
+    event InitialCapitalReceived(uint256 amount);
+    event BoardMemberContributionReceived(address indexed candidate, uint256 amount);
     event InternalTransfer(address indexed by, address indexed toRoleHolder, uint256 amount);
     event SupplierPaymentEscrowed(string internalOrderId, address indexed warehouse, address indexed supplier, uint256 amount);
     event SupplierPaymentReleased(string internalOrderId, address indexed supplier, uint256 amount);
     event EscrowRefunded(string internalOrderId, address indexed warehouse, uint256 amount);
     event SpendingPolicySet(address indexed setBy, address indexed warehouse, address indexed supplier, uint256 maxAmount);
     event FinanceDirectorSet(address indexed newDirector);
-    event RoleManagementFullAddressSet(address indexed rmFullAddress);
+    event RoleManagementFullAddressSet(address indexed rmFullAddress); // Though set in constructor now, event is good practice
     event WarehouseSupplierOrderManagementAddressSet(address indexed wsomAddress);
     event CustomerOrderManagementAddressSet(address indexed comAddress);
     event GeneralWithdrawal(address indexed by, address indexed recipient, uint256 amount, string reason);
     event CustomerRefundProcessedFromTreasury(uint256 indexed orderId, address indexed customer, uint256 amount);
 
+    // --- MODIFIERS ---
     modifier onlyFinanceDirector() {
         require(msg.sender == financeDirector, "CTM: Nguoi goi khong phai Giam doc Tai chinh");
         _;
     }
 
+    // --- CONSTRUCTOR ---
     constructor(
-        address _roleManagementAddress,     // Địa chỉ RoleManagement
+        address _roleManagementAddress,
         address _itemsManagementAddress,
-        uint256 _expectedInitialCapital     // Vốn ban đầu khi deploy CTM (ví dụ, từ người deploy tự góp)
-    ) Ownable() payable { // Sửa: Ownable() không có tham số
+        uint256 _expectedInitialCapital
+    ) Ownable() payable { // Ownable() constructor doesn't take arguments in OZ 4.x+
         require(_roleManagementAddress != address(0), "CTM: Dia chi RoleManagement khong hop le");
         require(_itemsManagementAddress != address(0), "CTM: Dia chi ItemsManagement khong hop le");
-        require(_expectedInitialCapital >= 0, "CTM: Von ban dau du kien khong the am"); // Cho phép vốn ban đầu là 0
-        roleManagement = IRoleManagementMinimalInterface(_roleManagementAddress);
-        itemsManagement = IItemsManagementMinimalInterface(_itemsManagementAddress);
-        roleManagementFullAddress = _roleManagementAddress; // Lưu địa chỉ đầy đủ để gọi các hàm trong IRoleManagementForBoardActivation
+        require(_expectedInitialCapital >= 0, "CTM: Von ban dau du kien khong the am");
+
+        roleManagement = IRoleManagement(_roleManagementAddress);
+        itemsManagement = IItemsManagementInterface(_itemsManagementAddress);
+        roleManagementFullAddress = _roleManagementAddress; // Store for board member activation
 
         if (_expectedInitialCapital > 0) {
             require(msg.value == _expectedInitialCapital, "CTM: So von ban dau gui khong chinh xac");
             emit InitialCapitalReceived(msg.value);
         } else {
-            // Nếu vốn ban đầu dự kiến là 0, không nên gửi Ether kèm theo
             require(msg.value == 0, "CTM: Khong nen gui Ether neu von ban dau du kien la 0");
         }
     }
 
+    // --- SETTER FUNCTIONS (Owner controlled) ---
     function setWarehouseSupplierOrderManagementAddress(address _wsomAddress) external onlyOwner {
         require(_wsomAddress != address(0), "CTM: Dia chi WSOM khong hop le");
         warehouseSupplierOrderManagement = _wsomAddress;
@@ -108,16 +94,21 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
 
     function setInitialFinanceDirector(address _director) external onlyOwner {
         require(_director != address(0), "CTM: Dia chi Giam doc khong the la zero");
-        bytes32 finDirectorRole = roleManagement.FINANCE_DIRECTOR_ROLE(); 
+        bytes32 finDirectorRole = roleManagement.FINANCE_DIRECTOR_ROLE();
         require(roleManagement.hasRole(finDirectorRole, _director), "CTM: Dia chi duoc gan thieu vai tro FIN_DIRECTOR_ROLE");
+        require(financeDirector == address(0), "CTM: Giam doc Tai chinh ban dau da duoc thiet lap"); // Can only set once initially
         financeDirector = _director;
         emit FinanceDirectorSet(_director);
     }
 
+    // --- RECEIVE ETHER ---
     receive() external payable {
         emit FundsDeposited(msg.sender, msg.value);
     }
 
+    // --- CORE TREASURY FUNCTIONS ---
+
+    // Called by Finance Director to top-up internal roles
     function transferToInternalRole(address _roleHolderAddress, bytes32 _roleKey)
         external
         onlyFinanceDirector
@@ -125,11 +116,13 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
     {
         require(_roleHolderAddress != address(0), "CTM: Dia chi nguoi giu vai tro khong the la zero");
         require(roleManagement.hasRole(_roleKey, _roleHolderAddress), "CTM: Dia chi muc tieu khong co vai tro duoc chi dinh");
+
         bytes32 finDirectorRole = roleManagement.FINANCE_DIRECTOR_ROLE();
         require(_roleKey != finDirectorRole, "CTM: Khong the nap tien cho vai tro Giam doc Tai chinh theo cach nay");
 
         uint256 targetBalance = _roleHolderAddress.balance;
         require(targetBalance < INTERNAL_ROLE_TOP_UP_THRESHOLD, "CTM: So du cua nguoi giu vai tro muc tieu khong duoi nguong");
+
         uint256 amountToSend = INTERNAL_ROLE_TOP_UP_AMOUNT;
         require(address(this).balance >= amountToSend, "CTM: Ngan quy khong du tien");
 
@@ -138,6 +131,7 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         emit InternalTransfer(msg.sender, _roleHolderAddress, amountToSend);
     }
 
+    // Called by Finance Director to set spending policies
     function setWarehouseSpendingPolicy(
         address _warehouseAddress,
         address _supplierAddress,
@@ -146,15 +140,20 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         require(_warehouseAddress != address(0), "CTM: Dia chi kho khong the la zero");
         require(_supplierAddress != address(0), "CTM: Dia chi NCC khong the la zero");
 
-        ItemsManagement.PhysicalLocationInfo memory whInfo = itemsManagement.getWarehouseInfo(_warehouseAddress);
+        // itemsManagement.getWarehouseInfo returns ItemsManagement.PhysicalLocationInfo
+        // We imported ItemsManagement.sol, so the compiler knows this struct.
+        Interfaces.PhysicalLocationInfo memory whInfo = itemsManagement.getWarehouseInfo(_warehouseAddress);
         require(whInfo.exists, "CTM: Kho khong ton tai trong IM");
+
         ItemsManagement.SupplierInfo memory supInfo = itemsManagement.getSupplierInfo(_supplierAddress);
-        require(supInfo.exists, "CTM: NCC khong ton tai trong IM");
+        require(supInfo.exists && supInfo.isApprovedByBoard, "CTM: NCC khong ton tai hoac chua duoc phe duyet trong IM");
+
 
         warehouseSpendingPolicies[_warehouseAddress][_supplierAddress] = _maxAmountPerOrder;
         emit SpendingPolicySet(msg.sender, _warehouseAddress, _supplierAddress, _maxAmountPerOrder);
     }
 
+    // Called by Finance Director for general withdrawals
     function generalWithdrawal(address payable _recipient, uint256 _amount, string calldata _reason)
         external
         onlyFinanceDirector
@@ -169,6 +168,7 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         emit GeneralWithdrawal(msg.sender, _recipient, _amount, _reason);
     }
 
+    // Called by Owner to change the Finance Director
     function changeFinanceDirector(address _newDirector) external onlyOwner {
         require(_newDirector != address(0), "CTM: Giam doc moi khong the la dia chi zero");
         bytes32 finDirectorRole = roleManagement.FINANCE_DIRECTOR_ROLE();
@@ -178,6 +178,7 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         emit FinanceDirectorSet(_newDirector);
     }
 
+    // --- ESCROW FUNCTIONS (Called by WarehouseSupplierOrderManagement) ---
     function requestEscrowForSupplierOrder(
         address _warehouseAddress,
         address _supplierAddress,
@@ -200,9 +201,12 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         require(address(this).balance >= _amount, "CTM: Ngan quy khong du tien de ky quy");
 
         activeEscrows[_internalSupplierOrderId] = EscrowDetails({
-            warehouseAddress: _warehouseAddress, supplierAddress: _supplierAddress, amount: _amount, active: true
+            warehouseAddress: _warehouseAddress,
+            supplierAddress: _supplierAddress,
+            amount: _amount,
+            active: true
         });
-        warehouseSpendingThisPeriod[_warehouseAddress] = spendingAfterThisOrder;
+        warehouseSpendingThisPeriod[_warehouseAddress] = spendingAfterThisOrder; // Update spending for the period
         emit SupplierPaymentEscrowed(_internalSupplierOrderId, _warehouseAddress, _supplierAddress, _amount);
         return true;
     }
@@ -221,17 +225,18 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         require(escrow.supplierAddress == _supplierAddressToVerify, "CTM: NCC khong khop de giai ngan");
         require(escrow.amount == _amountToVerify, "CTM: So tien khong khop de giai ngan");
 
-        escrow.active = false;
+        escrow.active = false; // Mark as inactive before transfer
         (bool success, ) = payable(escrow.supplierAddress).call{value: escrow.amount}("");
         if (!success) {
-            escrow.active = true; 
-            return false;
+            escrow.active = true; // Revert state if transfer fails
+            return false; // Indicate failure
         }
+        // warehouseSpendingThisPeriod is NOT reduced here, as the money has been spent
         emit SupplierPaymentReleased(_internalSupplierOrderId, escrow.supplierAddress, escrow.amount);
         return true;
     }
 
-    function refundEscrowToTreasury(
+    function refundEscrowToTreasury( // Called when an order is cancelled before payment release
         address _warehouseAddressToVerify,
         string calldata _internalSupplierOrderId,
         uint256 _amountToVerify
@@ -246,14 +251,16 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         require(escrow.amount == _amountToVerify, "CTM: So tien khong khop de hoan tra");
 
         escrow.active = false;
+        // Refund the spending amount back to the period's allowance
         warehouseSpendingThisPeriod[escrow.warehouseAddress] -= escrow.amount;
         emit EscrowRefunded(_internalSupplierOrderId, escrow.warehouseAddress, escrow.amount);
         return true;
     }
 
+    // --- CUSTOMER REFUND (Called by CustomerOrderManagement) ---
     function refundCustomerOrderFromTreasury(
-        uint256 _orderId, 
-        address payable _customerAddress, 
+        uint256 _orderId,
+        address payable _customerAddress,
         uint256 _amountToRefund
     )
         external
@@ -270,30 +277,51 @@ contract CompanyTreasuryManager is Ownable, ReentrancyGuard {
         emit CustomerRefundProcessedFromTreasury(_orderId, _customerAddress, _amountToRefund);
     }
 
-    // Ứng viên BĐH gửi vốn góp vào đây
+    // --- BOARD MEMBER CONTRIBUTION (Called directly by board candidates) ---
     function receiveBoardMemberContribution() external payable nonReentrant {
         address candidate = msg.sender;
         uint256 amountContributed = msg.value;
 
         require(roleManagementFullAddress != address(0), "CTM: Dia chi RoleManagement day du chua duoc thiet lap");
-        
-        uint256 proposedCapital = IRoleManagementForBoardActivationInterface(roleManagementFullAddress).getProposedShareCapital(candidate);
-        
+
+        // Use IRoleManagement from Interfaces.sol
+        uint256 proposedCapital = IRoleManagement(roleManagementFullAddress).getProposedShareCapital(candidate);
+
         require(proposedCapital > 0, "CTM: Khong co de xuat von cho ung vien nay hoac RoleManagement chua san sang");
         require(amountContributed == proposedCapital, "CTM: So tien gop khong dung voi de xuat von");
 
-        // msg.value đã tự động được cộng vào số dư của contract này
+        // Ether is already in this contract's balance due to `payable`
         emit BoardMemberContributionReceived(candidate, amountContributed);
 
-        // Gọi lại RoleManagement để kích hoạt thành viên
-        IRoleManagementForBoardActivationInterface(roleManagementFullAddress).activateBoardMemberByTreasury(candidate, amountContributed);
+        // Call back to RoleManagement to activate the member
+        IRoleManagement(roleManagementFullAddress).activateBoardMemberByTreasury(candidate, amountContributed);
     }
 
-    function getBalance() external view returns (uint256) { return address(this).balance; }
-    function getWarehouseSpendingPolicy(address _warehouseAddress, address _supplierAddress) external view returns (uint256) { return warehouseSpendingPolicies[_warehouseAddress][_supplierAddress]; }
-    function getWarehouseSpendingThisPeriod(address _warehouseAddress) external view returns (uint256) { return warehouseSpendingThisPeriod[_warehouseAddress]; }
-    function getEscrowDetails(string calldata _internalSupplierOrderId) external view returns (EscrowDetails memory) { return activeEscrows[_internalSupplierOrderId]; }
-    function WAREHOUSE_SPENDING_LIMIT_PER_PERIOD_CONST() external pure returns (uint256) { return WAREHOUSE_SPENDING_LIMIT_PER_PERIOD; }
-    function INTERNAL_ROLE_TOP_UP_THRESHOLD_CONST() external pure returns (uint256) { return INTERNAL_ROLE_TOP_UP_THRESHOLD; }
-    function INTERNAL_ROLE_TOP_UP_AMOUNT_CONST() external pure returns (uint256) { return INTERNAL_ROLE_TOP_UP_AMOUNT; }
+    // --- VIEW FUNCTIONS ---
+    function getBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function getWarehouseSpendingPolicy(address _warehouseAddress, address _supplierAddress) external view returns (uint256) {
+        return warehouseSpendingPolicies[_warehouseAddress][_supplierAddress];
+    }
+
+    function getWarehouseSpendingThisPeriod(address _warehouseAddress) external view returns (uint256) {
+        return warehouseSpendingThisPeriod[_warehouseAddress];
+    }
+
+    function getEscrowDetails(string calldata _internalSupplierOrderId) external view returns (EscrowDetails memory) {
+        return activeEscrows[_internalSupplierOrderId];
+    }
+
+    // --- CONSTANT GETTERS (useful for front-end or other contracts to know limits) ---
+    function WAREHOUSE_SPENDING_LIMIT_PER_PERIOD_CONST() external pure returns (uint256) {
+        return WAREHOUSE_SPENDING_LIMIT_PER_PERIOD;
+    }
+    function INTERNAL_ROLE_TOP_UP_THRESHOLD_CONST() external pure returns (uint256) {
+        return INTERNAL_ROLE_TOP_UP_THRESHOLD;
+    }
+    function INTERNAL_ROLE_TOP_UP_AMOUNT_CONST() external pure returns (uint256) {
+        return INTERNAL_ROLE_TOP_UP_AMOUNT;
+    }
 }
