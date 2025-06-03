@@ -1,51 +1,49 @@
-// migrations/7_deploy_warehouse_supplier_order.js
+// migrations/9_deploy_customer_order.js
 const RoleManagement = artifacts.require("RoleManagement");
 const ItemsManagementCore = artifacts.require("ItemsManagementCore");
-const ItemsPricingAndListing = artifacts.require("ItemsPricingAndListing"); // WSOM cần cả hai
+const ItemsPricingAndListing = artifacts.require("ItemsPricingAndListing"); // COM cần cả hai
 const CompanyTreasuryManager = artifacts.require("CompanyTreasuryManager");
-const WarehouseSupplierOrderManagement = artifacts.require("WarehouseSupplierOrderManagement");
+const CustomerOrderManagement = artifacts.require("CustomerOrderManagement");
 
 module.exports = async function (deployer, network, accounts) {
+  const deployerAccount = accounts[0];
   const roleManagementInstance = await RoleManagement.deployed();
   const itemsManagementCoreInstance = await ItemsManagementCore.deployed();
   const itemsPricingAndListingInstance = await ItemsPricingAndListing.deployed();
   const companyTreasuryManagerInstance = await CompanyTreasuryManager.deployed();
 
   if (!roleManagementInstance) {
-    console.error("LỖI: RoleManagement contract chưa được deploy! Không thể deploy WSOM.");
+    console.error("LỖI: RoleManagement contract chưa được deploy! Không thể deploy COM.");
     return;
   }
   if (!itemsManagementCoreInstance) {
-    console.error("LỖI: ItemsManagementCore contract chưa được deploy! Không thể deploy WSOM.");
+    console.error("LỖI: ItemsManagementCore contract chưa được deploy! Không thể deploy COM.");
     return;
   }
   if (!itemsPricingAndListingInstance) {
-    console.error("LỖI: ItemsPricingAndListing contract chưa được deploy! Không thể deploy WSOM.");
+    console.error("LỖI: ItemsPricingAndListing contract chưa được deploy! Không thể deploy COM.");
     return;
   }
   if (!companyTreasuryManagerInstance) {
-    console.error("LỖI: CompanyTreasuryManager contract chưa được deploy! Không thể deploy WSOM.");
+    console.error("LỖI: CompanyTreasuryManager contract chưa được deploy! Không thể deploy COM.");
     return;
   }
 
-  console.log(`Deploying WarehouseSupplierOrderManagement với:`);
+  console.log(`Deploying CustomerOrderManagement với:`);
   console.log(`  - RoleManagement tại: ${roleManagementInstance.address}`);
   console.log(`  - ItemsManagementCore tại: ${itemsManagementCoreInstance.address}`);
   console.log(`  - ItemsPricingAndListing tại: ${itemsPricingAndListingInstance.address}`);
   console.log(`  - CompanyTreasuryManager tại: ${companyTreasuryManagerInstance.address}`);
 
   await deployer.deploy(
-    WarehouseSupplierOrderManagement,
+    CustomerOrderManagement,
     roleManagementInstance.address,
     itemsManagementCoreInstance.address,
     itemsPricingAndListingInstance.address,
-    companyTreasuryManagerInstance.address
+    companyTreasuryManagerInstance.address,
+    { from: deployerAccount }
   );
 
-  const wsomInstance = await WarehouseSupplierOrderManagement.deployed();
-  console.log("WarehouseSupplierOrderManagement đã được deploy tại:", wsomInstance.address);
-<<<<<<<< HEAD:migrations/7_WarehouseSupplier.js
+  const comInstance = await CustomerOrderManagement.deployed();
+  console.log("CustomerOrderManagement đã được deploy tại:", comInstance.address);
 };
-========
-};
->>>>>>>> 1a951232f3c622da035b22a8bf24ff3cedc7aba8:migrations/7_deploy_warehouse_supplier_order.js
