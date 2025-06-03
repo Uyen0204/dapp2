@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./Interfaces.sol"; // Import file Interfaces.sol tập trung
 
-contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
+contract ItemsManagementCore is AccessControl{
     IRoleManagement public roleManagementExternal;
 
     // --- STRUCT DEFINITIONS ---
@@ -12,14 +12,14 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
     // và được contract này sử dụng/triển khai.
 
     // --- MAPPINGS ---
-    mapping(string => ItemInfo) public override items;
-    mapping(address => PhysicalLocationInfo) public override physicalLocations;
-    mapping(address => SupplierInfo) public override suppliers;
+    mapping(string => ItemInfo) public items;
+    mapping(address => PhysicalLocationInfo) public physicalLocations;
+    mapping(address => SupplierInfo) public suppliers;
 
     // --- ARRAYS FOR ITERATION ---
-    string[] public override itemIds;
-    address[] public override locationAddresses;
-    address[] public override supplierAddresses;
+    string[] public itemIds;
+    address[] public locationAddresses;
+    address[] public supplierAddresses;
 
     // --- EVENTS (chỉ những event liên quan đến core entities) ---
     event ItemProposed(string indexed itemId, string name, address indexed proposer);
@@ -100,7 +100,7 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
     }
 
     // --- QUẢN LÝ MẶT HÀNG BỞI BAN ĐIỀU HÀNH ---
-    function proposeNewItem(string calldata _itemId, string calldata _name, string calldata _description, string calldata _category) external override onlyBoardMember {
+    function proposeNewItem(string calldata _itemId, string calldata _name, string calldata _description, string calldata _category) external onlyBoardMember {
         require(!items[_itemId].exists, "ItemsMCore: ID mat hang da ton tai");
         require(bytes(_itemId).length > 0, "ItemsMCore: ID mat hang khong duoc rong");
 
@@ -120,7 +120,7 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
         emit ItemProposed(_itemId, _name, msg.sender);
     }
 
-    function approveProposedItem(string calldata _itemId, uint256 _referencePriceCeiling, address[] calldata _approvers) external override onlyBoardMember {
+    function approveProposedItem(string calldata _itemId, uint256 _referencePriceCeiling, address[] calldata _approvers) external onlyBoardMember {
         ItemInfo storage item = items[_itemId];
         require(item.exists, "ItemsMCore: Mat hang khong ton tai de phe duyet");
         require(!item.isApprovedByBoard, "ItemsMCore: Mat hang da duoc phe duyet roi");
@@ -133,7 +133,7 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
     }
 
     // --- QUẢN LÝ ĐỊA ĐIỂM BỞI BAN ĐIỀU HÀNH ---
-    function proposeNewPhysicalLocation(address _locationId, string calldata _name, string calldata _locationType) external override onlyBoardMember {
+    function proposeNewPhysicalLocation(address _locationId, string calldata _name, string calldata _locationType) external onlyBoardMember {
         require(!physicalLocations[_locationId].exists, "ItemsMCore: ID dia diem da ton tai");
         require(_locationId != address(0), "ItemsMCore: Dia chi dia diem khong hop le");
         bytes32 typeHash = keccak256(abi.encodePacked(_locationType));
@@ -154,7 +154,7 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
         emit PhysicalLocationProposed(_locationId, _name, _locationType, msg.sender);
     }
 
-    function approveProposedPhysicalLocation(address _locationId, address[] calldata _approvers) external override onlyBoardMember {
+    function approveProposedPhysicalLocation(address _locationId, address[] calldata _approvers) external onlyBoardMember {
         PhysicalLocationInfo storage loc = physicalLocations[_locationId];
         require(loc.exists, "ItemsMCore: Dia diem khong ton tai de phe duyet");
         require(!loc.isApprovedByBoard, "ItemsMCore: Dia diem da duoc phe duyet roi");
@@ -164,7 +164,7 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
         emit PhysicalLocationApprovedByBoard(_locationId, msg.sender);
     }
 
-    function assignManagerToLocation(address _locationId, address _managerId) external override {
+    function assignManagerToLocation(address _locationId, address _managerId) external {
         PhysicalLocationInfo storage loc = physicalLocations[_locationId];
         require(loc.exists && loc.isApprovedByBoard, "ItemsMCore: Dia diem chua ton tai hoac chua duoc BDH phe duyet");
         require(loc.manager == address(0), "ItemsMCore: Dia diem da co quan ly");
@@ -191,7 +191,7 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
         emit PhysicalLocationManagerAssigned(_locationId, _managerId, msg.sender);
     }
 
-    function setDesignatedSourceWarehouseForStore(address _storeAddress, address _warehouseAddress) external override onlyStoreDirector {
+    function setDesignatedSourceWarehouseForStore(address _storeAddress, address _warehouseAddress) external onlyStoreDirector {
         PhysicalLocationInfo storage storeInfo = physicalLocations[_storeAddress];
         require(storeInfo.exists && storeInfo.isApprovedByBoard && keccak256(abi.encodePacked(storeInfo.locationType)) == keccak256(abi.encodePacked("STORE")), "ItemsMCore: Cua hang khong ton tai, chua duoc BDH phe duyet, hoac khong phai la cua hang");
         if (_warehouseAddress != address(0)) {
@@ -203,7 +203,7 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
     }
 
     // --- QUẢN LÝ NHÀ CUNG CẤP BỞI BAN ĐIỀU HÀNH ---
-    function proposeNewSupplier(address _supplierId, string calldata _name) external override onlyBoardMember {
+    function proposeNewSupplier(address _supplierId, string calldata _name) external onlyBoardMember {
         require(!suppliers[_supplierId].exists, "ItemsMCore: ID NCC da ton tai");
         require(_supplierId != address(0), "ItemsMCore: Dia chi NCC khong hop le");
         require(roleManagementExternal.hasRole(roleManagementExternal.SUPPLIER_ROLE(), _supplierId), "ItemsMCore: NCC de xuat thieu vai tro NCC tu RM");
@@ -220,7 +220,7 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
         emit SupplierProposed(_supplierId, _name, msg.sender);
     }
 
-    function approveProposedSupplier(address _supplierId, address[] calldata _approvers) external override onlyBoardMember {
+    function approveProposedSupplier(address _supplierId, address[] calldata _approvers) external onlyBoardMember {
         SupplierInfo storage sup = suppliers[_supplierId];
         require(sup.exists, "ItemsMCore: NCC khong ton tai de phe duyet");
         require(!sup.isApprovedByBoard, "ItemsMCore: NCC da duoc phe duyet roi");
@@ -230,26 +230,26 @@ contract ItemsManagementCore is AccessControl, IItemsManagementCoreInterface {
     }
 
     // --- VIEW FUNCTIONS (implementing IItemsManagementCoreInterface) ---
-    function getItemInfo(string calldata _itemId) external view override returns (ItemInfo memory) {
+    function getItemInfo(string calldata _itemId) external view returns (ItemInfo memory) {
         return items[_itemId];
     }
-    function getPhysicalLocationInfo(address _locationId) external view override returns (PhysicalLocationInfo memory) {
+    function getPhysicalLocationInfo(address _locationId) external view returns (PhysicalLocationInfo memory) {
         return physicalLocations[_locationId];
     }
-    function getStoreInfo(address _storeAddress) external view override returns (PhysicalLocationInfo memory) {
+    function getStoreInfo(address _storeAddress) external view returns (PhysicalLocationInfo memory) {
         PhysicalLocationInfo memory loc = physicalLocations[_storeAddress];
         require(loc.exists && keccak256(abi.encodePacked(loc.locationType)) == keccak256(abi.encodePacked("STORE")), "ItemsMCore: Khong phai la cua hang");
         return loc;
     }
-    function getWarehouseInfo(address _warehouseAddress) external view override returns (PhysicalLocationInfo memory) {
+    function getWarehouseInfo(address _warehouseAddress) external view returns (PhysicalLocationInfo memory) {
         PhysicalLocationInfo memory loc = physicalLocations[_warehouseAddress];
         require(loc.exists && keccak256(abi.encodePacked(loc.locationType)) == keccak256(abi.encodePacked("WAREHOUSE")), "ItemsMCore: Khong phai la kho");
         return loc;
     }
-    function getSupplierInfo(address _supplierId) external view override returns (SupplierInfo memory) {
+    function getSupplierInfo(address _supplierId) external view returns (SupplierInfo memory) {
         return suppliers[_supplierId];
     }
-    function getAllItemIds() external view override returns (string[] memory) { return itemIds; }
-    function getAllLocationAddresses() external view override returns (address[] memory) { return locationAddresses; }
-    function getAllSupplierAddresses() external view override returns (address[] memory) { return supplierAddresses; }
+    function getAllItemIds() external view returns (string[] memory) { return itemIds; }
+    function getAllLocationAddresses() external view returns (address[] memory) { return locationAddresses; }
+    function getAllSupplierAddresses() external view returns (address[] memory) { return supplierAddresses; }
 }
