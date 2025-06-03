@@ -1,117 +1,174 @@
 {
-  "contractName": "ICompanyTreasuryManagerInterface",
+  "contractName": "IItemsManagementCoreInterface",
   "abi": [
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "warehouseAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "supplierAddress",
-          "type": "address"
-        },
-        {
           "internalType": "string",
-          "name": "supplierOrderId",
+          "name": "itemId",
           "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
         }
       ],
-      "name": "requestEscrowForSupplierOrder",
+      "name": "getItemInfo",
       "outputs": [
         {
-          "internalType": "bool",
-          "name": "success",
-          "type": "bool"
+          "components": [
+            {
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "category",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "exists",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "isApprovedByBoard",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "proposer",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "referencePriceCeiling",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct ItemInfo",
+          "name": "",
+          "type": "tuple"
         }
       ],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
       "inputs": [
         {
           "internalType": "address",
-          "name": "supplierAddress",
+          "name": "locationId",
           "type": "address"
-        },
-        {
-          "internalType": "string",
-          "name": "supplierOrderId",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
         }
       ],
-      "name": "releaseEscrowToSupplier",
+      "name": "getPhysicalLocationInfo",
       "outputs": [
         {
-          "internalType": "bool",
-          "name": "success",
-          "type": "bool"
+          "components": [
+            {
+              "internalType": "address",
+              "name": "locationId",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "locationType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "manager",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "exists",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "isApprovedByBoard",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "designatedSourceWarehouseAddress",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct PhysicalLocationInfo",
+          "name": "",
+          "type": "tuple"
         }
       ],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
       "inputs": [
         {
           "internalType": "address",
-          "name": "warehouseAddress",
+          "name": "storeAddress",
           "type": "address"
-        },
-        {
-          "internalType": "string",
-          "name": "supplierOrderId",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
         }
       ],
-      "name": "refundEscrowToTreasury",
+      "name": "getStoreInfo",
       "outputs": [
         {
-          "internalType": "bool",
-          "name": "success",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "warehouseAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "supplierAddress",
-          "type": "address"
-        }
-      ],
-      "name": "getWarehouseSpendingPolicy",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "maxAmountPerOrder",
-          "type": "uint256"
+          "components": [
+            {
+              "internalType": "address",
+              "name": "locationId",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "locationType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "manager",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "exists",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "isApprovedByBoard",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "designatedSourceWarehouseAddress",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct PhysicalLocationInfo",
+          "name": "",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
@@ -125,12 +182,90 @@
           "type": "address"
         }
       ],
-      "name": "getWarehouseSpendingThisPeriod",
+      "name": "getWarehouseInfo",
       "outputs": [
         {
-          "internalType": "uint256",
-          "name": "currentSpending",
-          "type": "uint256"
+          "components": [
+            {
+              "internalType": "address",
+              "name": "locationId",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "locationType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "manager",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "exists",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "isApprovedByBoard",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "designatedSourceWarehouseAddress",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct PhysicalLocationInfo",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "supplierId",
+          "type": "address"
+        }
+      ],
+      "name": "getSupplierInfo",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "supplierId",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "isApprovedByBoard",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "exists",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct SupplierInfo",
+          "name": "",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
@@ -138,42 +273,45 @@
     },
     {
       "inputs": [],
-      "name": "WAREHOUSE_SPENDING_LIMIT_PER_PERIOD_CONST",
+      "name": "getAllItemIds",
       "outputs": [
         {
-          "internalType": "uint256",
-          "name": "limit",
-          "type": "uint256"
+          "internalType": "string[]",
+          "name": "",
+          "type": "string[]"
         }
       ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [
+      "inputs": [],
+      "name": "getAllLocationAddresses",
+      "outputs": [
         {
-          "internalType": "uint256",
-          "name": "orderId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address payable",
-          "name": "customerAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amountToRefund",
-          "type": "uint256"
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
         }
       ],
-      "name": "refundCustomerOrderFromTreasury",
-      "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllSupplierAddresses",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.4+commit.c7e474f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"WAREHOUSE_SPENDING_LIMIT_PER_PERIOD_CONST\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"limit\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"warehouseAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"}],\"name\":\"getWarehouseSpendingPolicy\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"maxAmountPerOrder\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"warehouseAddress\",\"type\":\"address\"}],\"name\":\"getWarehouseSpendingThisPeriod\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"currentSpending\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"orderId\",\"type\":\"uint256\"},{\"internalType\":\"address payable\",\"name\":\"customerAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountToRefund\",\"type\":\"uint256\"}],\"name\":\"refundCustomerOrderFromTreasury\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"warehouseAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"supplierOrderId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"refundEscrowToTreasury\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"supplierOrderId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"releaseEscrowToSupplier\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"warehouseAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"supplierAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"supplierOrderId\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"requestEscrowForSupplierOrder\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces.sol\":\"ICompanyTreasuryManagerInterface\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces.sol\":{\"keccak256\":\"0x3cc233d3f609ee2bc47ca0e15d1890a0a40f3db7cd82f8a31d4f5a3a49d15d1a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8909076da9ffc6d5e5e747d3903bd59b6a25372952ffc111004520cd8f0548fe\",\"dweb:/ipfs/QmNQGTPj2niVA9y8Qemy7cHk2woL7NJBPyf4BAsSWAWeQQ\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.4+commit.c7e474f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getAllItemIds\",\"outputs\":[{\"internalType\":\"string[]\",\"name\":\"\",\"type\":\"string[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllLocationAddresses\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllSupplierAddresses\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"itemId\",\"type\":\"string\"}],\"name\":\"getItemInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"itemId\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"category\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"exists\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isApprovedByBoard\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"proposer\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"referencePriceCeiling\",\"type\":\"uint256\"}],\"internalType\":\"struct ItemInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"locationId\",\"type\":\"address\"}],\"name\":\"getPhysicalLocationInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"locationId\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"locationType\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"manager\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"exists\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isApprovedByBoard\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"designatedSourceWarehouseAddress\",\"type\":\"address\"}],\"internalType\":\"struct PhysicalLocationInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"storeAddress\",\"type\":\"address\"}],\"name\":\"getStoreInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"locationId\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"locationType\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"manager\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"exists\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isApprovedByBoard\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"designatedSourceWarehouseAddress\",\"type\":\"address\"}],\"internalType\":\"struct PhysicalLocationInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"supplierId\",\"type\":\"address\"}],\"name\":\"getSupplierInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"supplierId\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"isApprovedByBoard\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"exists\",\"type\":\"bool\"}],\"internalType\":\"struct SupplierInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"warehouseAddress\",\"type\":\"address\"}],\"name\":\"getWarehouseInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"locationId\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"locationType\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"manager\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"exists\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isApprovedByBoard\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"designatedSourceWarehouseAddress\",\"type\":\"address\"}],\"internalType\":\"struct PhysicalLocationInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces.sol\":\"IItemsManagementCoreInterface\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces.sol\":{\"keccak256\":\"0x3cc233d3f609ee2bc47ca0e15d1890a0a40f3db7cd82f8a31d4f5a3a49d15d1a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8909076da9ffc6d5e5e747d3903bd59b6a25372952ffc111004520cd8f0548fe\",\"dweb:/ipfs/QmNQGTPj2niVA9y8Qemy7cHk2woL7NJBPyf4BAsSWAWeQQ\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -4800,7 +4938,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-03T02:07:07.074Z",
+  "updatedAt": "2025-06-03T02:07:07.089Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
