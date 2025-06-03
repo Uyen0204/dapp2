@@ -1,12 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-// --- Forward declare structs that will be defined in ItemsManagement.sol ---
-// This helps Interfaces.sol compile and allows other contracts to understand
-// the shape of data returned by interface functions.
-// The "real" struct definitions are in ItemsManagement.sol.
-// MAKE SURE THESE MATCH THE STRUCTS IN ItemsManagement.sol EXACTLY!
-
+// --- Forward declare structs ---
+// (Giữ nguyên như cũ)
 struct PhysicalLocationInfo {
     address locationId;
     string name;
@@ -32,8 +28,21 @@ struct SupplierItemListing {
     bool exists;
 }
 
-// --- Interfaces for RoleManagement ---
+// Thêm ItemInfo vào đây vì nó cũng cần được các contract khác biết
+struct ItemInfo {
+    string itemId;
+    string name;
+    string description;
+    string category;
+    bool exists;
+    bool isApprovedByBoard;
+    address proposer; // Thành viên BĐH đề xuất
+    uint256 referencePriceCeiling; // Giá trần tham khảo do BĐH đặt
+}
 
+
+// --- Interfaces for RoleManagement ---
+// (Giữ nguyên như cũ)
 interface IRoleManagement {
     function STORE_DIRECTOR_ROLE() external view returns (bytes32);
     function WAREHOUSE_DIRECTOR_ROLE() external view returns (bytes32);
@@ -51,8 +60,7 @@ interface IRoleManagement {
     function getProposedShareCapital(address candidate) external view returns (uint256);
 }
 
-// This interface is used by several contracts for more general role checks.
-interface IRoleManagementInterface {
+interface IRoleManagementInterface { // Giữ nguyên
     function WAREHOUSE_MANAGER_ROLE() external view returns (bytes32);
     function SUPPLIER_ROLE() external view returns (bytes32);
     function STORE_MANAGER_ROLE() external view returns (bytes32);
@@ -61,34 +69,44 @@ interface IRoleManagementInterface {
 }
 
 
-// --- Interfaces for ItemsManagement ---
-// Now uses the locally forward-declared struct names
-interface IItemsManagementInterface {
-    function getWarehouseInfo(address warehouseAddress) external view returns (PhysicalLocationInfo memory);
-    function getSupplierInfo(address supplierAddress) external view returns (SupplierInfo memory);
+// --- Interface for ItemsManagementCore ---
+interface IItemsManagementCoreInterface {
+    // Functions related to ItemInfo, PhysicalLocationInfo, SupplierInfo
+    function getItemInfo(string calldata itemId) external view returns (ItemInfo memory);
+    function getPhysicalLocationInfo(address locationId) external view returns (PhysicalLocationInfo memory);
     function getStoreInfo(address storeAddress) external view returns (PhysicalLocationInfo memory);
+    function getWarehouseInfo(address warehouseAddress) external view returns (PhysicalLocationInfo memory);
+    function getSupplierInfo(address supplierId) external view returns (SupplierInfo memory);
+    function getAllItemIds() external view returns (string[] memory);
+    function getAllLocationAddresses() external view returns (address[] memory);
+    function getAllSupplierAddresses() external view returns (address[] memory);
+    // Thêm các hàm getter khác nếu cần cho các contract khác
+}
+
+// --- Interface for ItemsPricingAndListing ---
+interface IItemsPricingAndListingInterface {
+    // Functions related to SupplierItemListing, storeItemRetailPrices
     function getSupplierItemDetails(address supplierAddress, string calldata itemId) external view returns (SupplierItemListing memory);
     function getItemRetailPriceAtStore(string calldata itemId, address storeAddress) external view returns (uint256 price, bool priceExists);
+    // Thêm các hàm getter khác nếu cần cho các contract khác
 }
 
 
 // --- Interface for CompanyTreasuryManager ---
+// (Giữ nguyên như cũ, nhưng sẽ sử dụng IItemsManagementCoreInterface bên trong)
 interface ICompanyTreasuryManagerInterface {
-    // For WarehouseSupplierOrderManagement
     function requestEscrowForSupplierOrder(address warehouseAddress, address supplierAddress, string calldata supplierOrderId, uint256 amount) external returns (bool success);
     function releaseEscrowToSupplier(address supplierAddress, string calldata supplierOrderId, uint256 amount) external returns (bool success);
     function refundEscrowToTreasury(address warehouseAddress, string calldata supplierOrderId, uint256 amount) external returns (bool success);
     function getWarehouseSpendingPolicy(address warehouseAddress, address supplierAddress) external view returns (uint256 maxAmountPerOrder);
     function getWarehouseSpendingThisPeriod(address warehouseAddress) external view returns (uint256 currentSpending);
     function WAREHOUSE_SPENDING_LIMIT_PER_PERIOD_CONST() external view returns (uint256 limit);
-
-    // For CustomerOrderManagement
     function refundCustomerOrderFromTreasury(uint256 orderId, address payable customerAddress, uint256 amountToRefund) external;
 }
 
 // --- Interface for WarehouseInventoryManagement ---
+// (Giữ nguyên như cũ)
 interface IWarehouseInventoryManagementInterface {
-    // For StoreInventoryManagement
     function requestStockTransferToStore(
         address requestingStoreManager,
         address storeAddress,
@@ -96,11 +114,7 @@ interface IWarehouseInventoryManagementInterface {
         string calldata itemId,
         uint256 quantity
     ) external returns (uint256 internalTransferId);
-
-    // For WarehouseSupplierOrderManagement
     function recordStockInFromSupplier(address warehouseAddress, string calldata itemId, uint256 quantity, uint256 wsOrderId) external;
-
-    // For CustomerOrderManagement (returns)
      function recordReturnedStockByCustomer(
         address returnToWarehouseAddress,
         string calldata itemId,
@@ -110,8 +124,8 @@ interface IWarehouseInventoryManagementInterface {
 }
 
 // --- Interface for StoreInventoryManagement ---
+// (Giữ nguyên như cũ)
 interface IStoreInventoryManagementInterface {
-    // For WarehouseInventoryManagement
     function confirmStockReceivedFromWarehouse(
         address storeAddress,
         string calldata itemId,
@@ -119,8 +133,6 @@ interface IStoreInventoryManagementInterface {
         address fromWarehouseAddress,
         uint256 internalTransferId
     ) external;
-
-    // For CustomerOrderManagement
     function getStoreStockLevel(address storeAddress, string calldata itemId) external view returns (uint256);
     function deductStockForCustomerSale(address storeAddress, string calldata itemId, uint256 quantity, uint256 customerOrderId) external;
 }
