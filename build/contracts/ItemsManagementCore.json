@@ -41464,14 +41464,284 @@
   },
   "networks": {
     "5777": {
-      "events": {},
+      "events": {
+        "0x6fc42e6328d70476ac11e3bb6c632c610f1751d06b79b7edc25e912cdff27209": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "referencePriceCeiling",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "finalApprover",
+              "type": "address"
+            }
+          ],
+          "name": "ItemApprovedByBoard",
+          "type": "event"
+        },
+        "0x3ebb6331b48c504ca4922a2d92220f830467ca090a4b9fcbe10e1a6f3e97f589": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "proposer",
+              "type": "address"
+            }
+          ],
+          "name": "ItemProposed",
+          "type": "event"
+        },
+        "0x1fc7308c894d3036b33349c4b3d7d4b43c3927ac1286bc97a98c3c388fa97c7b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "locationId",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "finalApprover",
+              "type": "address"
+            }
+          ],
+          "name": "PhysicalLocationApprovedByBoard",
+          "type": "event"
+        },
+        "0xe1afc28d5cfbf961ed132b592d03e1026a060113945054c2c5ed4c90629022be": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "locationId",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newManager",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "byDirector",
+              "type": "address"
+            }
+          ],
+          "name": "PhysicalLocationManagerAssigned",
+          "type": "event"
+        },
+        "0x8ceaee252275277f7f06dcee470dc04ac7d5211d5c55802df06f3f64bda2025a": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "locationId",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "locationType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "proposer",
+              "type": "address"
+            }
+          ],
+          "name": "PhysicalLocationProposed",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        },
+        "0xdcc10de64617efb0774a78e440bcf4b7061baac845df589d7e28abcc07498e2c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "storeAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "designatedWarehouse",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "byStoreDirector",
+              "type": "address"
+            }
+          ],
+          "name": "StoreDesignatedSourceWarehouseSet",
+          "type": "event"
+        },
+        "0x195b79488d6b5260c5f4f4b0ab9f40b95cdd5e71279d52b1f96ff831270b1612": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "supplierId",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "finalApprover",
+              "type": "address"
+            }
+          ],
+          "name": "SupplierApprovedByBoard",
+          "type": "event"
+        },
+        "0xa360b642759fd1aef60fe12df288f0d8167355cc51b3062855ee99bd40738ccc": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "supplierId",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "proposer",
+              "type": "address"
+            }
+          ],
+          "name": "SupplierProposed",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0xFa15CBe662EeDdCa57F632AE0c5aeAC796Dd3EC2",
-      "transactionHash": "0x6b1b26d2d17413cba0f6cd1dd4b60482babbe84299ec4e949f902c2e49db50a3"
+      "address": "0xa4DF5038F72C5Be350c8C9220Cf3e0643B855e41",
+      "transactionHash": "0x8e28d1c53b23c65013da1fd83ec535ee42f3b3fd7a377158aa05d0631035643d"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-03T02:07:25.270Z",
+  "updatedAt": "2025-06-03T05:39:59.309Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

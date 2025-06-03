@@ -27944,14 +27944,177 @@
   },
   "networks": {
     "5777": {
-      "events": {},
+      "events": {
+        "0xbe696f12a96a6f8f4b21e86fe3146518f966e15fc92406bdf63f6b85e0b5377f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "storeAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "price",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "byStoreDirector",
+              "type": "address"
+            }
+          ],
+          "name": "RetailPriceSet",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        },
+        "0x87f1628ba253ef694374dcd44b8153c87ea09ac3bb7731c1214208b0c822817e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "supplierAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "price",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "autoApproved",
+              "type": "bool"
+            }
+          ],
+          "name": "SupplierItemListed",
+          "type": "event"
+        },
+        "0xffa7559584da41d8b3dc66ebfe805a6c2e3e8f3f94ec948a1ddfa57edea2d195": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "supplierAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "itemId",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "approver",
+              "type": "address"
+            }
+          ],
+          "name": "SupplierItemManuallyApprovedByBoard",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0xA1e84d1C27b951d2B583c70fe931393D41952d5B",
-      "transactionHash": "0xc882529f72b5904974f569a5375ba6e403b97a4c1da76efd71a3f7a131fcd263"
+      "address": "0x2321949E7C608825b3352896961c204f2cA672FC",
+      "transactionHash": "0xd3b021ce7d383785ca3578bcc1d7a5f9d9e84f2f6fec0b036c6bec8ea9c47f30"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-03T02:07:25.330Z",
+  "updatedAt": "2025-06-03T05:39:59.339Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

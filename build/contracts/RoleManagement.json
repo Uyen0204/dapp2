@@ -31751,12 +31751,12 @@
         }
       },
       "links": {},
-      "address": "0xB10A40cA8A3ADAff5b47Ee32C99E17af6200718E",
-      "transactionHash": "0x61d53c758b7beeeb28d10a78b2af70d210710c42a21b067e56db0f3b4d487bc1"
+      "address": "0xeedcac5825f0a3BB80AC5Cc145409427b611c252",
+      "transactionHash": "0x1afb6159ba60f5be089171614953ff620153cfc856cc6bcafff0699f04c7d478"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-03T02:07:25.196Z",
+  "updatedAt": "2025-06-03T05:39:59.292Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

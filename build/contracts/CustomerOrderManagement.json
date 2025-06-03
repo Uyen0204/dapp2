@@ -47112,12 +47112,12 @@
         }
       },
       "links": {},
-      "address": "0xDd366E86987fB560163C206d99f363Ae7c33DC01",
-      "transactionHash": "0x14e8b127b2ae85b0363c6aab15f76ec16849d30963531899e18c686d258e19d6"
+      "address": "0xbC657500D3bDF9A5aDeDEB5471a7e1287ba3BB98",
+      "transactionHash": "0xbe0314a380dbbdc826a3e26c8c277fa5e5e68dd9d89dd48ad21ea1e53e57134e"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-03T02:07:25.459Z",
+  "updatedAt": "2025-06-03T05:39:59.416Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

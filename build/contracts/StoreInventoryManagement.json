@@ -23862,12 +23862,12 @@
         }
       },
       "links": {},
-      "address": "0xD94dA5CFC68676B4DB2C9d3158654b0E1400B387",
-      "transactionHash": "0x71d1e78591f06ca6b0dc3ad6369bcea2eeee3e868667ee8ecef0482765729543"
+      "address": "0x95c356716FC03413e275E91c9aA34877BD87C328",
+      "transactionHash": "0x41d66f8cb378b7e722ebaa178f218b30ffbf2619f6a2e2a91d1f267da02dd700"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-03T02:07:25.405Z",
+  "updatedAt": "2025-06-03T05:39:59.382Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
