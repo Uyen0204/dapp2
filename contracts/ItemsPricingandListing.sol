@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./Interfaces.sol"; // Import file Interfaces.sol tập trung
 
-contract ItemsPricingAndListing is AccessControl {
+contract ItemsPricingAndListing is AccessControl, IItemsPricingAndListingInterface {
     IRoleManagement public roleManagementExternal;
     IItemsManagementCoreInterface public itemsManagementCore; // Để tham chiếu đến ItemsManagementCore
 
@@ -12,8 +12,8 @@ contract ItemsPricingAndListing is AccessControl {
     // SupplierItemListing được định nghĩa trong Interfaces.sol
 
     // --- MAPPINGS ---
-    mapping(address => mapping(string => SupplierItemListing)) public supplierItemListings;
-    mapping(address => mapping(string => uint256)) public storeItemRetailPrices;
+    mapping(address => mapping(string => SupplierItemListing)) public override supplierItemListings;
+    mapping(address => mapping(string => uint256)) public override storeItemRetailPrices;
 
     // --- EVENTS (chỉ những event liên quan đến pricing/listing) ---
     event SupplierItemListed(address indexed supplierAddress, string indexed itemId, uint256 price, bool autoApproved);
@@ -76,7 +76,7 @@ contract ItemsPricingAndListing is AccessControl {
 
 
     // --- NIÊM YẾT VÀ PHÊ DUYỆT MẶT HÀNG CỦA NHÀ CUNG CẤP ---
-    function listSupplierItem(string calldata _itemId, uint256 _price) external onlySupplier {
+    function listSupplierItem(string calldata _itemId, uint256 _price) external override onlySupplier {
         ItemInfo memory itemInfo = itemsManagementCore.getItemInfo(_itemId); // Gọi đến ItemsManagementCore
         require(itemInfo.exists && itemInfo.isApprovedByBoard, "ItemsPL: Mat hang khong ton tai hoac chua duoc BDH phe duyet chung");
         require(!supplierItemListings[msg.sender][_itemId].exists, "ItemsPL: Mat hang cua NCC da duoc niem yet");
@@ -94,7 +94,7 @@ contract ItemsPricingAndListing is AccessControl {
         emit SupplierItemListed(msg.sender, _itemId, _price, autoApproved);
     }
 
-    function approveSupplierItemManuallyByBoard(address _supplierAddress, string calldata _itemId, address[] calldata _approvers) external onlyBoardMember {
+    function approveSupplierItemManuallyByBoard(address _supplierAddress, string calldata _itemId, address[] calldata _approvers) external override onlyBoardMember {
         SupplierInfo memory supInfo = itemsManagementCore.getSupplierInfo(_supplierAddress); // Gọi đến ItemsManagementCore
         require(supInfo.exists && supInfo.isApprovedByBoard, "ItemsPL: NCC khong ton tai hoac chua duoc BDH phe duyet");
         
@@ -108,7 +108,7 @@ contract ItemsPricingAndListing is AccessControl {
     }
 
     // --- THIẾT LẬP GIÁ BÁN LẺ TẠI CỬA HÀNG ---
-    function setStoreItemRetailPrice(address _storeAddress, string calldata _itemId, uint256 _price) external onlyStoreDirector {
+    function setStoreItemRetailPrice(address _storeAddress, string calldata _itemId, uint256 _price) external override onlyStoreDirector {
         ItemInfo memory itemInfo = itemsManagementCore.getItemInfo(_itemId); // Gọi đến ItemsManagementCore
         require(itemInfo.exists && itemInfo.isApprovedByBoard, "ItemsPL: Mat hang khong ton tai hoac chua duoc BDH phe duyet");
         
@@ -121,11 +121,11 @@ contract ItemsPricingAndListing is AccessControl {
     }
 
     // --- VIEW FUNCTIONS (implementing IItemsPricingAndListingInterface) ---
-    function getSupplierItemDetails(address _supplierAddress, string calldata _itemId) external view returns (SupplierItemListing memory) {
+    function getSupplierItemDetails(address _supplierAddress, string calldata _itemId) external view override returns (SupplierItemListing memory) {
         return supplierItemListings[_supplierAddress][_itemId];
     }
 
-    function getItemRetailPriceAtStore(string calldata _itemId, address _storeAddress) external view returns (uint256 price, bool priceExists) {
+    function getItemRetailPriceAtStore(string calldata _itemId, address _storeAddress) external view override returns (uint256 price, bool priceExists) {
         price = storeItemRetailPrices[_storeAddress][_itemId];
         return (price, price > 0);
     }
